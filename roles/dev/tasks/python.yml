@@ -1,0 +1,14 @@
+---
+# --- ASDF Setup ---
+- name: Install ASDF plugins (bash/zsh sourcing needed or use full path)
+  shell: |
+    . /opt/asdf-vm/asdf.sh
+    asdf plugin add python || true
+    asdf plugin add poetry https://github.com/asdf-community/asdf-poetry.git || true
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
+  tags: [dev, python, asdf]
+
+# --- Python Tools ---
+# Poetry is already installed via pacman in main packages list

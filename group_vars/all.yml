@@ -1,0 +1,148 @@
+---
+project_name: ArchDev3.0
+owner: archdev
+default_user: "{{ ansible_user_id }}"
+
+# --- Official Repositories (Pacman) ---
+
+packages_hyprland:
+  - hyprland
+  - xdg-desktop-portal-hyprland
+  - xdg-desktop-portal-gtk
+  - polkit-kde-agent
+  - qt5-wayland
+  - qt6-wayland
+  - kvantum
+  - hyprlock
+  - hypridle
+  - waybar
+  - rofi
+  - dunst
+  - grim
+  - slurp
+  - wl-clipboard
+  - cliphist
+  - playerctl
+  - blueman
+  - pavucontrol
+  - network-manager-applet
+
+packages_theme:
+  - papirus-icon-theme
+  - arc-gtk-theme
+  - sddm
+  - qt5ct
+  - qt6ct
+  # Fonts
+  - ttf-jetbrains-mono-nerd
+  - noto-fonts
+  - noto-fonts-emoji
+
+packages_terminal:
+  - kitty
+  - zsh
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting
+  - zsh-completions
+  - starship
+  - eza
+  - bat
+  - fd
+  - ripgrep
+  - fzf
+  - btop
+  - fastfetch
+  - tree-sitter-cli
+  - jq
+
+packages_dev_tools:
+  - neovim
+  - lazygit
+  - make
+  - base-devel
+  - docker
+  - docker-compose
+  - direnv
+
+packages_dev_web:
+  - php
+  - php-fpm
+  - php-gd
+  - php-intl
+  - php-opcache
+  - php-redis
+  - php-imagick
+  - icu
+  - composer
+  - nodejs
+  - npm
+  - sqlite
+  - mariadb
+  - apache
+  - php-apache
+  - phpmyadmin
+
+packages_dev_python:
+  - python
+  - python-poetry
+  - tk
+
+packages_system:
+  - thunar
+  - tumbler
+  - ffmpegthumbnailer
+  - poppler-glib
+  - libgsf
+  - thunar-volman
+  - file-roller
+  - gvfs
+  - gvfs-smb
+  - ntfs-3g
+  - dosfstools
+  - exfatprogs
+  - udiskie
+  - unzip
+  - less
+  - nano
+  - xdg-user-dirs
+  - mousepad
+  - pacman-contrib
+  - rsync
+  - mkinitcpio-firmware
+  # AMD Graphics
+  - mesa
+  - vulkan-radeon
+  - libva-utils
+  - vdpauinfo
+  # Programs
+  - mpv
+  - inkscape
+  # Kernel Headers
+  - linux-lts-headers
+  - linux-headers
+
+packages_admin:
+  - snapper
+  - snap-pac
+  - ufw
+  - openssh
+
+# --- AUR Packages (Yay) ---
+
+packages_aur:
+  - wlogout
+  - swww
+  - hyprpicker
+  - nwg-look
+  - bibata-cursor-theme
+  - lazydocker
+  - asdf-vm
+  - btrfs-assistant
+  - limine-snapper-sync-git
+  - spicetify-cli
+  - waypaper
+  - imv
+  # Catppuccin Theme Packages
+  - catppuccin-gtk-theme-mocha
+  - catppuccin-cursors-mocha
+  - catppuccin-sddm-theme-mocha

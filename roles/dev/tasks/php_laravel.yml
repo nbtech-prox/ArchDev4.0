@@ -1,0 +1,122 @@
+---
+# --- Base Config ---
+- name: Set PHP timezone
+  lineinfile:
+    path: /etc/php/php.ini
+    regexp: ';date.timezone ='
+    line: 'date.timezone = UTC'
+  tags: [dev, php]
+
+# --- Enable Extensions ---
+- name: Enable PHP extensions
+  lineinfile:
+    path: /etc/php/php.ini
+    regexp: ';extension={{ item }}'
+    line: 'extension={{ item }}'
+  loop:
+    - bcmath
+    - intl
+    - pdo_mysql
+    - sqlite3
+    - curl
+    - iconv
+    - zip
+    - mysqli
+    - openssl
+    - gd
+    - bz2
+  tags: [dev, php, extensions]
+
+# --- Composer ---
+- name: Install Composer globally
+  get_url:
+    url: https://getcomposer.org/composer-stable.phar
+    dest: /usr/local/bin/composer
+    mode: '0755'
+  tags: [dev, php, composer]
+
+# --- MariaDB ---
+- name: Initialize MariaDB data directory
+  command: mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+  args:
+    creates: /var/lib/mysql/mysql
+  tags: [dev, mariadb]
+
+- name: Start and enable MariaDB service
+  systemd:
+    name: mariadb
+    enabled: yes
+    state: started
+  tags: [dev, mariadb]
+
+- name: Apply MariaDB Custom Optimization
+  copy:
+    src: mariadb_custom.cnf
+    dest: /etc/my.cnf.d/z-custom-archdev.cnf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart MariaDB
+  tags: [dev, mariadb]
+
+# --- Apache & phpMyAdmin ---
+- name: Install Apache phpMyAdmin Config
+  copy:
+    src: apache_phpmyadmin.conf
+    dest: /etc/httpd/conf/extra/phpmyadmin.conf
+    owner: root
+    group: root
+    mode: '0644'
+  tags: [dev, apache, phpmyadmin]
+
+- name: Install phpMyAdmin Config
+  copy:
+    src: phpmyadmin_config.inc.php
+    dest: /etc/webapps/phpmyadmin/config.inc.php
+    owner: root
+    group: http
+    mode: '0640'
+  tags: [dev, phpmyadmin]
+
+- name: Generate Random Blowfish Secret for phpMyAdmin
+  shell: openssl rand -base64 32 | tr -d /=+ | cut -c -32
+  register: blowfish_secret
+  changed_when: false
+  tags: [dev, phpmyadmin]
+
+- name: Set Blowfish Secret
+  replace:
+    path: /etc/webapps/phpmyadmin/config.inc.php
+    regexp: 'ARCHDEV_REPLACE_ME_WITH_RANDOM_STRING_32CH'
+    replace: "{{ blowfish_secret.stdout }}"
+  tags: [dev, phpmyadmin]
+
+- name: Include phpMyAdmin in Apache Config
+  lineinfile:
+    path: /etc/httpd/conf/httpd.conf
+    line: "Include conf/extra/phpmyadmin.conf"
+    state: present
+  notify: Restart Apache
+  tags: [dev, apache, phpmyadmin]
+
+- name: Enable MPM Prefork (Required for mod_php)
+  replace:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^LoadModule mpm_event_module'
+    replace: '#LoadModule mpm_event_module'
+  tags: [dev, apache]
+
+- name: Ensure MPM Prefork is loaded
+  replace:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '^#LoadModule mpm_prefork_module'
+    replace: 'LoadModule mpm_prefork_module'
+  notify: Restart Apache
+  tags: [dev, apache]
+
+- name: Start and enable Apache service
+  systemd:
+    name: httpd
+    enabled: yes
+    state: started
+  tags: [dev, apache]

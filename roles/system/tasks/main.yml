@@ -1,0 +1,14 @@
+---
+- name: Configure Zsh as default shell
+  user:
+    name: "{{ default_user }}"
+    shell: /usr/bin/zsh
+  tags: [system, shell]
+
+- name: Create standard user directories (Desktop, Downloads, etc.)
+  command: xdg-user-dirs-update
+  become: no # Run as user
+  tags: [system, xdg]
+
+- include_tasks: btrfs.yml
+  tags: [system, btrfs]

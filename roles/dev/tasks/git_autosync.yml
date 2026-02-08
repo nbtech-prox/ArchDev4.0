@@ -1,0 +1,27 @@
+---
+# --- Git Auto-Sync ---
+- name: Install Git Auto-Sync Script
+  copy:
+    src: git-autosync.sh
+    dest: /usr/local/bin/git-autosync
+    mode: '0755'
+    owner: root
+    group: root
+  tags: [dev, git-autosync]
+
+- name: Create Git Auto-Sync Service
+  template:
+    src: git-autosync.service.j2
+    dest: /etc/systemd/system/git-autosync.service
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Git Auto-Sync
+  tags: [dev, git-autosync]
+
+- name: Enable Git Auto-Sync Service
+  systemd:
+    name: git-autosync
+    enabled: yes
+    state: started
+  tags: [dev, git-autosync]

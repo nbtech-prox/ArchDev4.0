@@ -1,0 +1,8 @@
+*.retry
+*.pyc
+.DS_Store
+.vagrant/
+.idea/
+*.swp
+*.log
+ansible-*.tar.gz

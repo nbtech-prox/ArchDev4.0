@@ -1,0 +1,10 @@
+---
+- name: Core System Setup & Configuration
+  hosts: all
+  become: true
+  roles:
+    - common
+    - system
+    - desktop
+    - dev
+    - dotfiles

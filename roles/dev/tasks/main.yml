@@ -1,0 +1,42 @@
+---
+- name: Install Developer Tools
+  pacman:
+    name: "{{ packages_dev_tools + packages_terminal }}"
+    state: present
+  tags: [dev, tools]
+
+- name: Install Web Dev Stack (PHP/Laravel)
+  pacman:
+    name: "{{ packages_dev_web }}"
+    state: present
+  tags: [dev, web]
+
+- name: Install Python Stack
+  pacman:
+    name: "{{ packages_dev_python }}"
+    state: present
+  tags: [dev, python]
+
+- name: Configure Docker
+  user:
+    name: "{{ default_user }}"
+    groups: docker
+    append: yes
+  tags: [dev, docker]
+
+- name: Enable Docker Service
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+  tags: [dev, docker]
+
+# Include sub-tasks
+- include_tasks: php_laravel.yml
+  tags: [dev, web]
+
+- include_tasks: python.yml
+  tags: [dev, python]
+
+- include_tasks: git_autosync.yml
+  tags: [dev, git-autosync]

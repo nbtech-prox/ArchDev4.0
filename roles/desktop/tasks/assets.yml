@@ -1,0 +1,50 @@
+---
+# --- Wallpaper Setup ---
+- name: Create Wallpapers directory
+  file:
+    path: "{{ ansible_user_dir }}/Imagens/Wallpapers/Nord"
+    state: directory
+    recurse: yes
+  tags: [desktop, wallpaper]
+
+- name: Copy Wallpapers
+  synchronize:
+    src: "{{ role_path }}/files/wallpapers/"
+    dest: "{{ ansible_user_dir }}/Imagens/Wallpapers/Nord/"
+  become: no
+  ignore_errors: yes # Don't fail if source is empty
+  tags: [desktop, wallpaper]
+
+# --- Firefox User.js ---
+- name: Configure Firefox user.js (Nordic)
+  copy:
+    src: firefox_user.js
+    dest: "{{ ansible_user_dir }}/.mozilla/firefox/nord.default/user.js"
+  when:  ansible_facts['os_family'] == 'Archlinux' # Simplified check
+  ignore_errors: yes # Profile might not exist yet if firefox wasn't run
+  tags: [desktop, firefox]
+
+# --- Other Desktop Configs ---
+# GTK, QT, etc.
+- name: Sync GTK Configs
+  synchronize:
+    src: "{{ role_path }}/files/gtk/"
+    dest: "{{ ansible_user_dir }}/.config/gtk-3.0/" # Example, adjust path based on source structure
+  become: no
+  ignore_errors: yes
+  tags: [desktop, gtk]
+
+- name: Apply GTK Theme (Catppuccin Mocha)
+  command: gsettings set org.gnome.desktop.interface gtk-theme 'Catppuccin-Mocha-Standard-Blue-Dark'
+  become: no
+  tags: [desktop, theme, apply]
+
+- name: Apply Icon Theme (Papirus)
+  command: gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
+  become: no
+  tags: [desktop, theme, apply]
+
+- name: Apply Cursor Theme (Catppuccin Mocha)
+  command: gsettings set org.gnome.desktop.interface cursor-theme 'Catppuccin-Mocha-Dark-Cursors'
+  become: no
+  tags: [desktop, theme, apply]

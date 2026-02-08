@@ -1,0 +1,92 @@
+configuration {
+    modi: "drun,run,window,calc,emoji";
+    show-icons: true;
+    display-drun: "󰀻 Apps";
+    display-run: "󰁔 Run";
+    display-window: "󱂬 Windows";
+    display-calc: "󰃬 Calc";
+    display-emoji: "󰞅 Emoji";
+    drun-display-format: "{name}";
+    font: "JetBrainsMono Nerd Font 12";
+    terminal: "kitty";
+    
+    /* Configuração para fechar ao clicar fora */
+    hover-select: true;
+    me-select-entry: "";
+    me-accept-entry: "MousePrimary";
+}
+
+@theme "/dev/null"
+
+* {
+    bg: #1e1e2e;
+    bg-alt: #313244;
+    fg: #cdd6f4;
+    accent: #cba6f7;
+    urgent: #f38ba8;
+
+    background-color: transparent;
+    text-color: @fg;
+    margin: 0;
+    padding: 0;
+    spacing: 0;
+}
+
+window {
+    width: 650px;
+    height: 450px;
+    border: 1px;
+    border-color: @accent;
+    background-color: @bg;
+    border-radius: 12px;
+    location: center;
+    anchor: center;
+}
+
+mainbox {
+    padding: 20px;
+    children: [inputbar, listview];
+}
+
+inputbar {
+    background-color: @bg-alt;
+    margin: 0 0 20px 0;
+    padding: 12px;
+    border-radius: 8px;
+    children: [prompt, entry];
+}
+
+prompt {
+    font: "JetBrainsMono Nerd Font 14";
+    padding: 0 10px 0 0;
+}
+
+entry {
+    placeholder: "Search applications...";
+    placeholder-color: #585b70;
+}
+
+listview {
+    columns: 2;
+    lines: 8;
+    fixed-height: true;
+}
+
+element {
+    padding: 8px;
+    border-radius: 6px;
+    spacing: 10px;
+}
+
+element selected {
+    background-color: @accent;
+    text-color: @bg;
+}
+
+element-icon {
+    size: 32px;
+}
+
+element-text {
+    vertical-align: 0.5;
+}

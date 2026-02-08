@@ -1,0 +1,15 @@
+---
+- name: Restart MariaDB
+  systemd:
+    name: mariadb
+    state: restarted
+
+- name: Restart Apache
+  systemd:
+    name: httpd
+    state: restarted
+
+- name: Restart Git Auto-Sync
+  systemd:
+    name: git-autosync
+    state: restarted

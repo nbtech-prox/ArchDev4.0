@@ -1,0 +1,41 @@
+---
+# Check if yay is installed
+- name: Check if yay is installed
+  command: which yay
+  register: yay_check
+  ignore_errors: true
+  changed_when: false
+  tags: [aur, yay]
+
+# Install yay if not present
+- name: Clone yay repository
+  git:
+    repo: https://aur.archlinux.org/yay.git
+    dest: /tmp/yay
+  become: no
+  when: yay_check.rc != 0
+  tags: [aur, yay]
+
+- name: Build and install yay
+  command: makepkg -si --noconfirm
+  args:
+    chdir: /tmp/yay
+  become: no
+  when: yay_check.rc != 0
+  tags: [aur, yay]
+
+- name: Remove yay build directory
+  file:
+    path: /tmp/yay
+    state: absent
+  when: yay_check.rc != 0
+  tags: [aur, yay]
+
+# Generic task to install AUR packages
+- name: Install AUR packages
+  command: "yay -S --noconfirm {{ item }}"
+  loop: "{{ packages_aur }}"
+  become: no # yay should not be run as root
+  register: aur_install
+  changed_when: "'there is nothing to do' not in aur_install.stdout"
+  tags: [aur, packages]

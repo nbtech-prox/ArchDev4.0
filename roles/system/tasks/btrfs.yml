@@ -1,0 +1,64 @@
+---
+- name: Determine if Limine is the bootloader
+  stat:
+    path: /boot/limine.conf
+  register: limine_conf
+  tags: [system, btrfs, boot]
+
+- name: Determine if Limine config is in alternate location
+  stat:
+    path: /boot/limine.cfg
+  register: limine_cfg
+  tags: [system, btrfs, boot]
+
+- name: Install Limine Snapper Sync (AUR)
+  command: "yay -S --noconfirm limine-snapper-sync-git"
+  become: no
+  when: limine_conf.stat.exists or limine_cfg.stat.exists
+  tags: [system, btrfs, boot]
+
+- name: Configure Snapper for Root
+  command: snapper -c root create-config /
+  args:
+    creates: /etc/snapper/configs/root
+  tags: [system, btrfs, snapper]
+
+- name: Adjust Snapper Retention Policy (Limit 3)
+  lineinfile:
+    path: /etc/snapper/configs/root
+    regexp: "^{{ item.key }}=\".*\""
+    line: "{{ item.key }}=\"{{ item.value }}\""
+  loop:
+    - { key: 'NUMBER_LIMIT', value: '3' }
+    - { key: 'NUMBER_LIMIT_IMPORTANT', value: '2' }
+    - { key: 'TIMELINE_LIMIT_HOURLY', value: '3' }
+    - { key: 'TIMELINE_LIMIT_DAILY', value: '2' }
+    - { key: 'TIMELINE_LIMIT_WEEKLY', value: '0' }
+    - { key: 'TIMELINE_LIMIT_MONTHLY', value: '0' }
+    - { key: 'TIMELINE_LIMIT_YEARLY', value: '0' }
+  tags: [system, btrfs, snapper]
+
+- name: Enable Snapper Timers
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - snapper-timeline.timer
+    - snapper-cleanup.timer
+  tags: [system, btrfs, snapper]
+
+- name: Enable Limine Snapper Sync Service
+  systemd:
+    name: limine-snapper-sync.path
+    enabled: yes
+    state: started
+  when: limine_conf.stat.exists or limine_cfg.stat.exists
+  tags: [system, btrfs, boot]
+
+- name: Ensure correct permissions for .snapshots
+  file:
+    path: /.snapshots
+    mode: '0750'
+    state: directory
+  tags: [system, btrfs, snapper]

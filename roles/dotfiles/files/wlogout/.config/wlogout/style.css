@@ -1,0 +1,55 @@
+* {
+  background-image: none;
+}
+
+window {
+  background-color: rgba(
+    46,
+    52,
+    64,
+    0.9
+  ); /* Nord Polar Night com transparência */
+}
+
+button {
+  color: #eceff4;
+  background-color: #3b4252;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 10px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 25%;
+  margin: 10px;
+  transition:
+    box-shadow 0.2s ease-in-out,
+    background-color 0.2s ease-in-out;
+}
+
+button:focus,
+button:active,
+button:hover {
+  background-color: #88c0d0; /* Nord Frost */
+  color: #2e3440;
+  outline-style: none;
+}
+
+#lock {
+  background-image: image(url("/usr/share/wlogout/icons/lock.png"));
+}
+
+#logout {
+  background-image: image(url("/usr/share/wlogout/icons/logout.png"));
+}
+
+#suspend {
+  background-image: image(url("/usr/share/wlogout/icons/suspend.png"));
+}
+
+#shutdown {
+  background-image: image(url("/usr/share/wlogout/icons/shutdown.png"));
+}
+
+#reboot {
+  background-image: image(url("/usr/share/wlogout/icons/reboot.png"));
+}

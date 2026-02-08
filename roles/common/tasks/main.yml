@@ -1,0 +1,67 @@
+---
+- name: Configure UFW Defaults
+  ufw:
+    state: enabled
+    policy: deny
+    direction: incoming
+  become: yes
+  tags: [system, firewall]
+
+- name: Allow Outgoing UFW
+  ufw:
+    state: enabled
+    policy: allow
+    direction: outgoing
+  become: yes
+  tags: [system, firewall]
+
+- name: Allow SSH
+  ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+  become: yes
+  tags: [system, firewall]
+
+- name: Allow Dev Ports
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - '8000' # Laravel
+    - '8080' # Node
+    - '5000' # Flask
+    - '8550' # Flet
+  become: yes
+  tags: [system, firewall]
+
+- name: Update system packages (Arch Linux)
+  pacman:
+    update_cache: yes
+    upgrade: yes
+  tags: [system, update]
+
+- name: Install base system utilities
+  pacman:
+    name: "{{ packages_system + packages_admin + ['rsync'] }}"
+    state: present
+  tags: [system, base]
+
+- name: Enable essential services
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop:
+    - ufw
+    - sshd
+    - NetworkManager
+    - bluetooth
+    - sddm
+  ignore_errors: true
+  tags: [system, services]
+
+# Include AUR tasks
+- include_tasks: aur.yml
+  tags: [aur]
