@@ -4,16 +4,16 @@
 
 window {
   background-color: rgba(
+    30,
+    30,
     46,
-    52,
-    64,
     0.9
-  ); /* Nord Polar Night com transparência */
+  ); /* Catppuccin Mocha Base com transparência */
 }
 
 button {
-  color: #eceff4;
-  background-color: #3b4252;
+  color: #cdd6f4;  /* Catppuccin Mocha Text */
+  background-color: #313244;  /* Catppuccin Mocha Surface0 */
   border-style: solid;
   border-width: 2px;
   border-radius: 10px;
@@ -29,8 +29,8 @@ button {
 button:focus,
 button:active,
 button:hover {
-  background-color: #88c0d0; /* Nord Frost */
-  color: #2e3440;
+  background-color: #89b4fa;  /* Catppuccin Mocha Blue */
+  color: #1e1e2e;  /* Catppuccin Mocha Base */
   outline-style: none;
 }
 

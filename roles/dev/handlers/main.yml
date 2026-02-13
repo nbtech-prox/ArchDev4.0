@@ -9,6 +9,11 @@
     name: httpd
     state: restarted
 
+- name: Restart PHP-FPM
+  systemd:
+    name: php-fpm
+    state: restarted
+
 - name: Restart Git Auto-Sync
   systemd:
     name: git-autosync

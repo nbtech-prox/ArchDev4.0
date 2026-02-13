@@ -41,12 +41,13 @@ O **ArchDev v3.0** não é apenas uma atualização visual. É uma evolução na
 - **Boot**: Limine + Btrfs Assistant
 
 ### Development Ready (Últimas Versões)
-- **Laravel 12 (High Performance)**:
-    - **PHP 8.x**: Com todas as extensões ativas (bcmath, intl, gd, pdo, etc.).
-    - **MariaDB Otimizado**: Configuração "Muscle Car" para 64GB RAM + NVMe (Buffers otimizados).
+- **Laravel / PHP (ASDF Versionado)**:
+    - **PHP 8.x via ASDF**: Versionamento de PHP por projeto usando `bubble l`.
+    - Todas as extensões ativas (bcmath, intl, gd, pdo, etc.).
+    - **MariaDB Otimizado**: Configuração "Muscle Car" para 64GB RAM + NVMe.
     - **Apache**: Configurado com `mpm_prefork` e suporte a vhosts.
     - **phpMyAdmin**: Pré-configurado via Apache e Socket Unix.
-- **Python Ecosystem**: Poetry + Pyenv (via ASDF) para gestão hermética.
+- **Python Ecosystem**: Poetry + Pyenv (via ASDF) para gestão hermética (`bubble p`).
 - **Docker**: Configurado (rootless opcional) e `docker-compose`.
 
 ---
@@ -76,7 +77,7 @@ chmod +x setup.sh
 **O que o script faz sozinho:**
 1.  Verifica e instala o Ansible.
 2.  Instala todos os pacotes (Pacman + AUR).
-3.  Configura o sistema (Btrfs, Snapper, Plymouth).
+3.  Configura o sistema (Btrfs, Snapper).
 4.  Configura a UI (Hyprland, Waybar, Catppuccin).
 5.  Sincroniza os Dotfiles e Scripts.
 

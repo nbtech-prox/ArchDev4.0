@@ -1,5 +1,26 @@
 ---
-# --- Base Config ---
+# --- ASDF Setup for PHP Version Management ---
+# Permite usar 'bubble l' para criar ambientes PHP isolados com versões específicas
+- name: Install ASDF PHP plugin
+  shell: |
+    . /opt/asdf-vm/asdf.sh
+    asdf plugin add php https://github.com/asdf-community/asdf-php.git || true
+  args:
+    executable: /bin/bash
+  ignore_errors: yes
+  tags: [dev, php, asdf]
+
+- name: Ensure ASDF shims are in PATH for subsequent tasks
+  lineinfile:
+    path: "{{ ansible_user_dir }}/.zshenv"
+    line: 'export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"'
+    create: yes
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0644'
+  ignore_errors: yes
+  tags: [dev, php, asdf]
+
 - name: Set PHP timezone
   lineinfile:
     path: /etc/php/php.ini
@@ -25,7 +46,47 @@
     - openssl
     - gd
     - bz2
+    - exif
+    - fileinfo
+    - ftp
+    - gettext
+    - mbstring
+  notify: Restart PHP-FPM
   tags: [dev, php, extensions]
+
+# --- PHP Development Configuration ---
+- name: Configure PHP for Development (Laravel Optimized)
+  lineinfile:
+    path: /etc/php/php.ini
+    regexp: '{{ item.regexp }}'
+    line: '{{ item.line }}'
+  loop:
+    # Memory
+    - { regexp: '^memory_limit\s*=.*', line: 'memory_limit = 512M' }
+    # File Uploads
+    - { regexp: '^upload_max_filesize\s*=.*', line: 'upload_max_filesize = 128M' }
+    - { regexp: '^post_max_size\s*=.*', line: 'post_max_size = 128M' }
+    - { regexp: '^max_file_uploads\s*=.*', line: 'max_file_uploads = 20' }
+    # Execution
+    - { regexp: '^max_execution_time\s*=.*', line: 'max_execution_time = 300' }
+    - { regexp: '^max_input_time\s*=.*', line: 'max_input_time = 300' }
+    - { regexp: '^max_input_vars\s*=.*', line: 'max_input_vars = 5000' }
+    # Error Reporting (Development)
+    - { regexp: '^error_reporting\s*=.*', line: 'error_reporting = E_ALL' }
+    - { regexp: '^display_errors\s*=.*', line: 'display_errors = On' }
+    - { regexp: '^display_startup_errors\s*=.*', line: 'display_startup_errors = On' }
+    - { regexp: '^log_errors\s*=.*', line: 'log_errors = On' }
+    # OPcache (Performance)
+    - { regexp: '^;opcache.enable\s*=.*', line: 'opcache.enable = 1' }
+    - { regexp: '^;opcache.memory_consumption\s*=.*', line: 'opcache.memory_consumption = 256' }
+    - { regexp: '^;opcache.max_accelerated_files\s*=.*', line: 'opcache.max_accelerated_files = 20000' }
+    - { regexp: '^;opcache.revalidate_freq\s*=.*', line: 'opcache.revalidate_freq = 0' }
+    - { regexp: '^;opcache.validate_timestamps\s*=.*', line: 'opcache.validate_timestamps = 1' }
+    # Realpath Cache
+    - { regexp: '^;realpath_cache_size\s*=.*', line: 'realpath_cache_size = 4096K' }
+    - { regexp: '^;realpath_cache_ttl\s*=.*', line: 'realpath_cache_ttl = 600' }
+  notify: Restart PHP-FPM
+  tags: [dev, php, config]
 
 # --- Composer ---
 - name: Install Composer globally

@@ -109,7 +109,12 @@ alias flask-dev='export FLASK_DEBUG=1 && poetry run flask run'
 [ -f /usr/share/fzf/key-bindings.zsh ] && source /usr/share/fzf/key-bindings.zsh
 [ -f /usr/share/fzf/completion.zsh ] && source /usr/share/fzf/completion.zsh
 
-# 6.1 DIRENV (Hermetic Environments)
+# 6.1 ASDF (Version Manager)
+if [ -f /opt/asdf-vm/asdf.sh ]; then
+    source /opt/asdf-vm/asdf.sh
+fi
+
+# 6.2 DIRENV (Hermetic Environments)
 eval "$(direnv hook zsh)"
 
 # 7. STARSHIP

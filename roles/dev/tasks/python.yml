@@ -1,9 +1,10 @@
 ---
-# --- ASDF Setup ---
-- name: Install ASDF plugins (bash/zsh sourcing needed or use full path)
+# --- ASDF Setup for Python/Poetry Version Management ---
+# Permite usar 'bubble p' para criar ambientes Python isolados com Poetry
+- name: Install ASDF Python and Poetry plugins
   shell: |
     . /opt/asdf-vm/asdf.sh
-    asdf plugin add python || true
+    asdf plugin add python https://github.com/asdf-community/asdf-python.git || true
     asdf plugin add poetry https://github.com/asdf-community/asdf-poetry.git || true
   args:
     executable: /bin/bash
@@ -11,4 +12,4 @@
   tags: [dev, python, asdf]
 
 # --- Python Tools ---
-# Poetry is already installed via pacman in main packages list
+# Poetry também é instalado via pacman (fallback), mas ASDF permite versionamento por projeto

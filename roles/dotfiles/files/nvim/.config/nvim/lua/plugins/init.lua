@@ -1,11 +1,39 @@
 return {
-  -- Nord Theme
+  -- Catppuccin Mocha Theme
   {
-    "shaunsingh/nord.nvim",
+    "catppuccin/nvim",
+    name = "catppuccin",
     lazy = false,
     priority = 1000,
     config = function()
-      vim.cmd([[colorscheme nord]])
+      require("catppuccin").setup({
+        flavour = "mocha", -- latte, frappe, macchiato, mocha
+        transparent_background = false,
+        show_end_of_buffer = false,
+        term_colors = true,
+        dim_inactive = {
+          enabled = false,
+          shade = "dark",
+          percentage = 0.15,
+        },
+        styles = {
+          comments = { "italic" },
+          conditionals = { "italic" },
+        },
+        integrations = {
+          treesitter = true,
+          telescope = true,
+          lsp_trouble = true,
+          which_key = true,
+          bufferline = true,
+          cmp = true,
+          gitsigns = true,
+          nvimtree = true,
+          notify = true,
+          mini = true,
+        },
+      })
+      vim.cmd([[colorscheme catppuccin-mocha]])
     end,
   },
 
@@ -80,7 +108,7 @@ return {
     "nvim-lualine/lualine.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
-      require("lualine").setup({ options = { theme = "nord", icons_enabled = true } })
+      require("lualine").setup({ options = { theme = "catppuccin", icons_enabled = true } })
     end,
   },
 

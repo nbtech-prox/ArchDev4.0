@@ -40,8 +40,8 @@ while true; do
             # Check for unpushed commits
             if git status -sb 2>/dev/null | grep -q "ahead"; then
                 log "Pushing changes for: $repo_dir"
-                git push --all >> "$LOG_FILE" 2>&1
-                git push --tags >> "$LOG_FILE" 2>&1
+                git push origin --all >> "$LOG_FILE" 2>&1
+                git push origin --tags >> "$LOG_FILE" 2>&1
             fi
         done
     fi

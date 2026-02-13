@@ -127,6 +127,9 @@ packages_admin:
   - ufw
   - openssh
 
+# --- Diretórios ---
+projects_dir: "/mnt/projetos"
+
 # --- AUR Packages (Yay) ---
 
 packages_aur:

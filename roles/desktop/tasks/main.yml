@@ -20,7 +20,7 @@
 # --- Firefox Profile ---
 - name: Create Firefox Profile Directory
   file:
-    path: "{{ ansible_user_dir }}/.mozilla/firefox/nord.default"
+    path: "{{ ansible_user_dir }}/.mozilla/firefox/catppuccin.default"
     state: directory
     owner: "{{ default_user }}"
     group: "{{ default_user }}"
@@ -46,7 +46,6 @@
     mode: 'a+wr'
     recurse: yes
   when: spicetify_check.rc == 0 and ansible_facts['os_family'] == 'Archlinux' # Only if spotify is in /opt
-  ignore_errors: true
   ignore_errors: true
   tags: [desktop, spicetify]
 
