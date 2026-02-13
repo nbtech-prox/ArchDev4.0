@@ -48,61 +48,54 @@
             "8": "Ⅷ",
             "9": "Ⅸ",
             "10": "Ⅹ",
-            "urgent": "⚠",
-            "focused": "◆",
+            "urgent": "!",
+            "focused": "●",
             "default": "○"
         }
     },
     "tray": {
-        "icon-size": 13,
+        "icon-size": 14,
         "spacing": 10
     },
     "clock": {
-        "format": " {:%H:%M   %e %b}",
+        "format": " {:%H:%M}",
+        "format-alt": " {:%d/%m/%Y}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
     "network": {
         "format-wifi": "{icon}",
         "format-ethernet": "",
-        "format-disconnected": "⚠",
+        "format-disconnected": "",
         "tooltip-format": "{essid}",
         "on-click": "nm-connection-editor",
         "format-icons": [
-            "󰤯 ",
-            "󰤟 ",
-            "󰤢 ",
-            "󰤥 ",
-            "󰤨 "
+            "",
+            "",
+            "",
+            "",
+            ""
         ]
-    },
-    "pulseaudio": {
-        "format": "{icon}",
-        "format-muted": "󰖁",
-        "on-click": "pavucontrol",
-        "on-scroll-up": "~/.config/hypr/scripts/volume-control.sh up",
-        "on-scroll-down": "~/.config/hypr/scripts/volume-control.sh down",
-        "format-icons": {
-            "headphone": "󰋋",
-            "hands-free": "󰋎",
-            "headset": "󰋎",
-            "phone": "",
-            "portable": "",
-            "car": "",
-            "default": [
-                "󰕿",
-                "󰖀",
-                "󰕾"
-            ]
-        }
     },
     "bluetooth": {
         "format": "",
         "format-disabled": "",
         "format-connected": " {num_connections}",
-        "tooltip-format": "{controller_alias}\t{controller_address}",
-        "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
-        "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+        "tooltip-format": "{controller_alias}",
+        "tooltip-format-connected": "{controller_alias}\n\n{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}",
         "on-click": "blueman-manager"
+    },
+    "pulseaudio": {
+        "format": "{icon}",
+        "format-muted": "",
+        "format-icons": {
+            "headphone": "",
+            "headset": "",
+            "default": ["", "", ""]
+        },
+        "on-click": "pavucontrol",
+        "on-scroll-up": "~/.config/hypr/scripts/volume-control.sh up",
+        "on-scroll-down": "~/.config/hypr/scripts/volume-control.sh down"
     },
     "custom/power": {
         "format": "",

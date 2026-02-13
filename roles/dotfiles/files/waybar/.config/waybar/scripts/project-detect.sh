@@ -10,21 +10,21 @@ CWD=$(readlink -f /proc/$PID/cwd 2>/dev/null)
 [[ ! -d "$CWD" ]] && exit 0
 
 PROJECT=""
-ICON="⚙️"
+ICON=""
 ENV_INFO=""
 
 # 1. Detecção de Tipo de Projeto
 if [[ -f "$CWD/artisan" || -f "$CWD/../artisan" || -f "$CWD/teste/artisan" ]]; then
-    ICON="🟥"
+    ICON=""
     PROJECT="Laravel"
 elif [[ -f "$CWD/app.py" || -f "$CWD/run.py" || -f "$CWD/main.py" ]]; then
-    ICON="🟦"
+    ICON=""
     PROJECT="Python"
 elif [[ -f "$CWD/package.json" ]]; then
-    ICON=""
+    ICON=""
     PROJECT="NodeJS"
 elif [[ -f "$CWD/.tool-versions" ]]; then
-    ICON="🛠️"
+    ICON=""
     PROJECT="Env"
 fi
 
@@ -48,7 +48,7 @@ fi
 
 # 4. Indicador de Direnv Ativo
 if [[ -d "$CWD/.direnv" || -d "$CWD/../.direnv" ]]; then
-    ENV_INFO="$ENV_INFO 🫧"
+    ENV_INFO="$ENV_INFO "
 fi
 
 # Se não detectou nada relevante, sai silenciosamente

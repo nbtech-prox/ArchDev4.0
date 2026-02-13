@@ -6,10 +6,10 @@
 UPDATES=$(checkupdates 2>/dev/null | wc -l)
 
 if [ "$UPDATES" -eq 0 ]; then
-    echo "📦 0"
+    echo ""
     exit 0
 else
-    echo "📦 $UPDATES"
+    echo " $UPDATES"
 fi
 
 # Quando clicado

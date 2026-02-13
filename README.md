@@ -34,11 +34,13 @@ O **ArchDev v3.0** não é apenas uma atualização visual. É uma evolução na
 
 ### Core
 - **Window Manager**: Hyprland (Wayland puro)
-- **Barra**: Waybar (Estilo "Pill" Catppuccin)
+- **Barra**: Waybar (Estilo "Pill" Catppuccin) com notificações de updates
 - **Launcher**: Rofi (Substituto do Wofi da v2.0)
 - **Terminal**: Kitty (GPU accelerated) + ZSH + Starship Prompt
 - **Editor**: Neovim Pro (Lazy.nvim, LSP, Treesitter)
+- **PDF**: Zathura (tema Catppuccin Mocha)
 - **Boot**: Limine + Btrfs Assistant
+- **Saúde**: Wlsunset (filtro de luz azul automático)
 
 ### Development Ready (Últimas Versões)
 - **Laravel / PHP (ASDF Versionado)**:
@@ -49,6 +51,7 @@ O **ArchDev v3.0** não é apenas uma atualização visual. É uma evolução na
     - **phpMyAdmin**: Pré-configurado via Apache e Socket Unix.
 - **Python Ecosystem**: Poetry + Pyenv (via ASDF) para gestão hermética (`bubble p`).
 - **Docker**: Configurado (rootless opcional) e `docker-compose`.
+- **Password Manager**: `pass` + `rofi-pass` (Super+P) para gestão segura de passwords.
 
 ---
 
@@ -111,7 +114,14 @@ docker run hello-world
 ### 3. Spotify
 O Spotify e o tema Catppuccin já estão instalados. Basta abrir o Spotify uma vez para ativar.
 
-### 4. Apagar a Pasta de Instalação (Opcional)
+### 4. Password Manager (pass)
+Configura o gestor de passwords (requer chave GPG):
+```bash
+archdev-pass-setup
+```
+Depois usa `Super+P` para abrir o rofi-pass.
+
+### 5. Apagar a Pasta de Instalação (Opcional)
 Após a instalação completa, a pasta `ArchDev3.0/` pode ser removida:
 ```bash
 cd ..
@@ -119,7 +129,7 @@ rm -rf ArchDev3.0/
 ```
 O sistema fica totalmente independente.
 
-### 5. Limpeza do Sistema
+### 6. Limpeza do Sistema
 Mantenha o sistema leve:
 *   `paccache -r`: Mantém apenas as 3 últimas versões de pacotes.
 *   `docker system prune -a`: Remove containers e imagens não usados.
@@ -170,6 +180,7 @@ Se ativar esta opção, o serviço `git-autosync` corre em background:
 | `Super + B` | Abrir Browser (Firefox) |
 | `Super + E` | Abrir Explorador (Thunar) |
 | `Super + Space` | Lançador de Apps (Rofi) |
+| `Super + P` | Password Manager (rofi-pass) |
 | `Super + Q` | Fechar Janela Ativa |
 | `Super + X` | Menu de Energia (Wlogout) |
 | `Super + V` | Colar do Histórico (Cliphist) |
@@ -189,6 +200,61 @@ A tecla **Leader** é o `Espaço`.
 | `Space + lg` | Abrir LazyGit |
 | `Space + w` | Salvar Ficheiro |
 | `Space + q` | Sair |
+
+---
+
+## ⌨️ Terminal Aliases (ZSH)
+
+### Navegação & Sistema
+| Alias | Comando | Descrição |
+| :--- | :--- | :--- |
+| `ls` | `eza --icons --group-directories-first` | Listar com ícones |
+| `ll` | `eza -l --icons --group-directories-first` | Listar detalhado |
+| `la` | `eza -la --icons --group-directories-first` | Listar tudo (inclui ocultos) |
+| `cat` | `bat` | Cat com syntax highlighting |
+| `sys` | `btop` | Monitor de sistema |
+
+### Pacman/Yay (AUR)
+| Alias | Comando | Descrição |
+| :--- | :--- | :--- |
+| `install` | `yay -S` | Instalar pacote |
+| `update` | `yay -Syu` | Atualizar sistema |
+| `search` | `yay -Ss` | Procurar pacote |
+| `remove` | `yay -Rns` | Remover pacote |
+
+### Desenvolvimento
+| Alias | Comando | Descrição |
+| :--- | :--- | :--- |
+| `nv` | `nvim` | Abrir Neovim |
+| `edit` | `nvim` | Editar ficheiro |
+| `lg` | `lazygit` | Git TUI |
+| `ld` | `lazydocker` | Docker TUI |
+
+### Laravel (PHP)
+| Alias | Comando | Descrição |
+| :--- | :--- | :--- |
+| `artisan` | `php artisan` | Comandos Laravel |
+| `serve` | `php artisan serve` | Servidor de desenvolvimento |
+| `migrate` | `php artisan migrate` | Executar migrations |
+| `fresh` | `php artisan migrate:fresh --seed` | Reset BD com seeds |
+| `tinker` | `php artisan tinker` | Console interativo |
+
+### Python / Poetry
+| Alias | Comando | Descrição |
+| :--- | :--- | :--- |
+| `py` | `python` | Python |
+| `p` | `poetry` | Poetry |
+| `pr` | `poetry run` | Executar no ambiente Poetry |
+| `ps` | `poetry shell` | Entrar no shell Poetry |
+| `pa` | `poetry add` | Adicionar dependência |
+| `flet-run` | `poetry run flet run` | Executar app Flet |
+| `flask-dev` | `export FLASK_DEBUG=1 && poetry run flask run` | Flask em modo dev |
+
+### Ambientes Herméticos (`bubble`)
+| Comando | Descrição |
+| :--- | :--- |
+| `bubble p` | Criar ambiente Python/Poetry (cria `.tool-versions` + direnv) |
+| `bubble l` | Criar ambiente Laravel/PHP (cria `.tool-versions` + direnv) |
 
 ---
 
