@@ -26,6 +26,9 @@ packages_hyprland:
   - blueman
   - pavucontrol
   - network-manager-applet
+  - wlsunset  # Filtro de luz azul
+  - zathura
+  - zathura-pdf-mupdf
 
 packages_theme:
   - papirus-icon-theme
@@ -54,6 +57,9 @@ packages_terminal:
   - fastfetch
   - tree-sitter-cli
   - jq
+  - pass        # Password store
+  - gnupg       # GPG para pass
+  - xclip       # Clipboard para pass
 
 packages_dev_tools:
   - neovim

@@ -1,0 +1,39 @@
+# Rofi-pass configuration
+# Password manager integration with rofi
+
+# === Aparência (Catppuccin Mocha) ===
+# Usa o tema do rofi definido em config.rasi
+
+# === Comportamento ===
+# Mostra apenas nomes das entradas (sem path)
+show="name"
+
+# Copia para clipboard
+clip="primary"
+
+# Tempo de limpeza do clipboard (segundos)
+timeout=45
+
+# Comandos
+# autotype: usuário + Tab + password + Enter
+autotype="xdotool type --clearmodifiers"
+
+# === Ações ===
+# Enter = copiar password
+# Tab = autotype (usuário + password)
+# Ctrl+Enter = copiar usuário
+# Ctrl+Shift+Enter = copiar URL
+
+# === Notificações ===
+# Usa dunst para notificações
+notify="dunstify"
+
+# Mensagens
+notify_opts="-a 'Rofi Pass' -u normal"
+
+# === GPG ===
+# Usa gpg-agent para passphrase
+# Configuração em ~/.gnupg/gpg-agent.conf
+
+# === Atalhos ===
+# Estes são mapeados no rofi, não no rofi-pass diretamente

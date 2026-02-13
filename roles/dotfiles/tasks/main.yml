@@ -43,6 +43,7 @@
     - wlogout
     - nvim
     - starship
+    - zathura
   become: no
   tags: [dotfiles, config]
   # synchronize uses rsync, so ensure rsync is installed (base-devel/pacman)

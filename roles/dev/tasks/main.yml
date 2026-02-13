@@ -44,6 +44,9 @@
 - include_tasks: docker_helper.yml
   tags: [dev, docker]
 
+- include_tasks: pass_helper.yml
+  tags: [dev, pass]
+
 - name: Copy MariaDB setup helper script
   copy:
     src: mariadb-setup.sh

@@ -110,15 +110,12 @@
         "tooltip": false
     },
     "custom/updates": {
-        "format": "{} ",
-        "return-type": "json",
-        "format-icons": {
-            "has-updates": "",
-            "updated": ""
-        },
-        "exec": "$HOME/.config/waybar/scripts/updates.sh",
-        "interval": 3600,
-        "on-click": "kitty --class update -e sh -c 'yay; echo Done - Press enter to exit; read'"
+        "format": "{}",
+        "exec": "$HOME/.config/waybar/scripts/updates-notify.sh",
+        "interval": 1800,
+        "on-click": "$HOME/.config/waybar/scripts/updates-notify.sh click",
+        "tooltip": true,
+        "tooltip-format": "Clique para atualizar"
     },
     "custom/project": {
         "format": "{}",

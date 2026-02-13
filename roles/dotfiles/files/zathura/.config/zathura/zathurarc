@@ -1,0 +1,119 @@
+# Zathura - PDF Viewer Configuration
+# Tema: Catppuccin Mocha
+
+# === Interface ===
+set window-title-basename true
+set statusbar-home-tilde true
+set selection-clipboard clipboard
+set window-title-page true
+
+# === Fontes ===
+set font "JetBrainsMono Nerd Font 11"
+
+# === Cores (Catppuccin Mocha) ===
+# Background
+set default-bg "#1e1e2e"           # Base
+set default-fg "#cdd6f4"           # Text
+
+# Status Bar
+set statusbar-bg "#181825"         # Mantle
+set statusbar-fg "#cdd6f4"         # Text
+
+# Input Bar
+set inputbar-bg "#1e1e2e"          # Base
+set inputbar-fg "#cdd6f4"          # Text
+
+# Notifications
+set notification-bg "#1e1e2e"      # Base
+set notification-fg "#cdd6f4"      # Text
+set notification-error-bg "#f38ba8"    # Red
+set notification-error-fg "#1e1e2e"    # Base
+set notification-warning-bg "#fab387"  # Peach
+set notification-warning-fg "#1e1e2e"  # Base
+
+# Completion
+set completion-bg "#313244"        # Surface0
+set completion-fg "#cdd6f4"        # Text
+set completion-highlight-bg "#89b4fa"  # Blue
+set completion-highlight-fg "#1e1e2e"  # Base
+set completion-group-bg "#181825"  # Mantle
+set completion-group-fg "#89b4fa"  # Blue
+
+# Index (outline)
+set index-bg "#1e1e2e"             # Base
+set index-fg "#cdd6f4"             # Text
+set index-active-bg "#89b4fa"      # Blue
+set index-active-fg "#1e1e2e"      # Base
+
+# Render
+set render-loading-bg "#1e1e2e"    # Base
+set render-loading-fg "#cdd6f4"    # Text
+
+# Highlight
+set highlight-color "#f9e2af"      # Yellow (selection)
+set highlight-active-color "#cba6f7" # Mauve (current)
+
+# Recolor (dark mode para PDFs)
+set recolor true
+set recolor-lightcolor "#1e1e2e"   # Base
+set recolor-darkcolor "#cdd6f4"    # Text
+set recolor-reverse-video true
+set recolor-keephue true
+
+# === Configurações de Zoom ===
+set zoom-min 10
+set zoom-max 1000
+set zoom-step 10
+
+# === Scroll ===
+set scroll-step 50
+set scroll-full-overlap 0.2
+set scroll-page-aware true
+
+# === Ajustes Visuais ===
+set adjust-open "best-fit"
+set pages-per-row 1
+
+# === Cache ===
+set render-cache "yes"
+set render-cache-size 50
+
+# === Atalhos Customizados ===
+# Fullscreen
+map f toggle_fullscreen
+map [fullscreen] f toggle_fullscreen
+
+# Recolor toggle
+map i set recolor
+
+# Zoom
+map + zoom in
+map - zoom out
+map = zoom original
+
+# Rotate
+map r rotate rotate-cw
+map R rotate rotate-ccw
+
+# Modo presentation
+map F5 toggle_page_mode
+
+# Busca
+map / search
+map ? search_backward
+map n search_next
+map N search_previous
+
+# Navegação
+map <PageUp> navigate previous
+map <PageDown> navigate next
+map <Home> goto top
+map <End> goto bottom
+
+# Clipboard
+map y copy_selection
+map Y copy_link_target
+
+# Abrir link
+map o follow_link
+map O follow_link_external
