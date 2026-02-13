@@ -29,6 +29,7 @@ packages_hyprland:
   - wlsunset  # Filtro de luz azul
   - zathura
   - zathura-pdf-mupdf
+  - swappy  # Editor de screenshots
 
 packages_theme:
   - papirus-icon-theme
@@ -132,6 +133,8 @@ packages_admin:
   - snap-pac
   - ufw
   - openssh
+  - fail2ban  # Proteção contra brute force SSH
+  - lynis     # Auditoria de segurança
 
 # --- Diretórios ---
 projects_dir: "/mnt/projetos"

@@ -34,13 +34,15 @@ O **ArchDev v3.0** não é apenas uma atualização visual. É uma evolução na
 
 ### Core
 - **Window Manager**: Hyprland (Wayland puro)
-- **Barra**: Waybar (Estilo "Pill" Catppuccin) com notificações de updates
+- **Barra**: Waybar (Estilo "Pill" Catppuccin) com deteção inteligente de projetos
 - **Launcher**: Rofi (Substituto do Wofi da v2.0)
 - **Terminal**: Kitty (GPU accelerated) + ZSH + Starship Prompt
 - **Editor**: Neovim Pro (Lazy.nvim, LSP, Treesitter)
 - **PDF**: Zathura (tema Catppuccin Mocha)
+- **Screenshots**: Grim + Slurp + Swappy (editor visual)
+- **Clipboard**: Cliphist + GUI (rofi)
 - **Boot**: Limine + Btrfs Assistant
-- **Saúde**: Wlsunset (filtro de luz azul automático)
+- **Saúde**: Wlsunset (filtro de luz azul) com toggle rápido
 
 ### Development Ready (Últimas Versões)
 - **Laravel / PHP (ASDF Versionado)**:
@@ -52,6 +54,7 @@ O **ArchDev v3.0** não é apenas uma atualização visual. É uma evolução na
 - **Python Ecosystem**: Poetry + Pyenv (via ASDF) para gestão hermética (`bubble p`).
 - **Docker**: Configurado (rootless opcional) e `docker-compose`.
 - **Password Manager**: `pass` + `rofi-pass` (Super+P) para gestão segura de passwords.
+- **Segurança**: Fail2ban (proteção SSH), UFW firewall, auditoria Lynis
 
 ---
 
@@ -121,7 +124,14 @@ archdev-pass-setup
 ```
 Depois usa `Super+P` para abrir o rofi-pass.
 
-### 5. Apagar a Pasta de Instalação (Opcional)
+### 5. Backup de Chaves de Segurança (Importante!)
+Faça backup das tuas chaves SSH e GPG:
+```bash
+archdev-backup-keys
+```
+Guarda o backup num local seguro (USB, cloud cifrada).
+
+### 6. Apagar a Pasta de Instalação (Opcional)
 Após a instalação completa, a pasta `ArchDev3.0/` pode ser removida:
 ```bash
 cd ..
@@ -129,10 +139,11 @@ rm -rf ArchDev3.0/
 ```
 O sistema fica totalmente independente.
 
-### 6. Limpeza do Sistema
+### 7. Limpeza do Sistema
 Mantenha o sistema leve:
 *   `paccache -r`: Mantém apenas as 3 últimas versões de pacotes.
 *   `docker system prune -a`: Remove containers e imagens não usados.
+*   `sudo lynis audit system`: Auditoria de segurança periódica.
 
 ---
 
@@ -181,13 +192,49 @@ Se ativar esta opção, o serviço `git-autosync` corre em background:
 | `Super + E` | Abrir Explorador (Thunar) |
 | `Super + Space` | Lançador de Apps (Rofi) |
 | `Super + P` | Password Manager (rofi-pass) |
+| `Super + V` | Clipboard Manager (GUI com histórico) |
+| `Super + Shift + V` | Toggle Floating Window |
+| `Super + Shift + N` | Toggle Night Mode (luz azul) |
 | `Super + Q` | Fechar Janela Ativa |
 | `Super + X` | Menu de Energia (Wlogout) |
-| `Super + V` | Colar do Histórico (Cliphist) |
 | `Super + L` | Bloquear Ecrã (Hyprlock) |
 | `Super + Setas` | Mover Foco |
 | `Super + Shift + Setas` | Mover Janela |
 | `Super + 1-9` | Mudar Workspace |
+
+### 🪟 Gestão de Janelas
+| Atalho | Ação |
+| :--- | :--- |
+| `Super + F` | Fullscreen |
+| `Super + Shift + V` | Toggle Floating Window |
+| `Super + Shift + P` | Pseudo Tiling (Dwindle) |
+| `Super + J` | Toggle Split (Dwindle) |
+
+### 🗂️ Workspaces Avançados
+| Atalho | Ação |
+| :--- | :--- |
+| `Super + Tab` | Workspace Anterior |
+| `Super + Ctrl + Setas` | Workspace Seguinte/Anterior |
+| `Super + Ctrl + H/L` | Workspace Seguinte/Anterior (Vim-style) |
+| `Super + Shift + Setas` | Mover Janela para Workspace Adjacente |
+| `Super + Shift + H/L` | Mover Janela para Workspace Adjacente (Vim-style) |
+| `Super + Shift + 1-9` | Mover Janela para Workspace Específico |
+| `Super + S` | Toggle Special Workspace (Scratchpad) |
+| `Super + Shift + S` | Mover Janela para Special Workspace |
+| `Super + Scroll` | Mudar Workspace com Rato |
+
+### 🖱️ Rato (Mouse)
+| Ação | Comando |
+| :--- | :--- |
+| `Super + Botão Esquerdo` | Mover Janela |
+| `Super + Botão Direito` | Redimensionar Janela |
+
+### 📸 Screenshots (Grim + Swappy)
+| Atalho | Ação |
+| :--- | :--- |
+| `Print` | Capturar Região → Editor Swappy |
+| `Shift + Print` | Capturar Ecrã Inteiro → Editor Swappy |
+| `Ctrl + Print` | Capturar Região → Clipboard |
 
 ### 💻 Neovim Pro (A tua IDE)
 A tecla **Leader** é o `Espaço`.
@@ -258,11 +305,74 @@ A tecla **Leader** é o `Espaço`.
 
 ---
 
-## 🛡️ Segurança BTRFS (Snapshots)
-A política de retenção está configurada para manter apenas os **3 últimos snapshots**.
-*   O sistema cria um snapshot automático antes de cada instalação.
-*   Se o sistema partir, reinicie e escolha o snapshot anterior no Boot Menu do Limine.
-*   Não precisa de fazer nada manual. É automático.
+## 🛠️ Comandos ArchDev (Helpers)
+
+Scripts instalados automaticamente:
+
+| Comando | Descrição |
+| :--- | :--- |
+| `archdev-mariadb-setup` | Configura MariaDB com password segura |
+| `archdev-backup-keys` | Backup de chaves SSH + GPG |
+| `archdev-pass-setup` | Configura password manager (pass) |
+
+---
+
+## 🛡️ Segurança (5 Camadas de Proteção)
+
+### 1. Btrfs + Snapper (Recuperação)
+- Snapshots automáticos antes de cada instalação
+- Retenção: 3 snapshots (não enche o disco)
+- Rollback no boot menu (Limine)
+- **Automático** - não precisas fazer nada
+
+### 2. Firewall UFW (Proteção de Rede)
+- Política padrão: negar entrada, permitir saída
+- Portas abertas: SSH (22), dev ports (8000, 8080, 5000, 8550)
+- Comando: `sudo ufw status`
+
+### 3. Fail2ban (Proteção SSH)
+- Bloqueia IPs após 3 tentativas falhadas de login
+- Tempo de ban: 1 hora
+- Ignora redes locais (192.168.x.x, 10.x.x.x)
+- Comando: `sudo fail2ban-client status`
+
+### 4. Password Manager (Proteção de Credenciais)
+- `pass` + GPG: passwords cifradas localmente
+- Integração rofi: `Super+P`
+- Backup: `archdev-backup-keys`
+
+Thinking
+Pronto! 🎉 Todas as 5 melhorias implementadas + segurança 5 estrelas!
+
+✅ Melhorias Implementadas
+#	Melhoria	Como Usar
+1	Night Mode Toggle	Super+Shift+N - Liga/desliga filtro de luz azul
+2	Clipboard Manager GUI	Super+V - Interface rofi com histórico
+3	Screenshot Editor	Print ou Shift+Print - Abre Swappy para editar
+4	Backup de Chaves	archdev-backup-keys - Backup SSH + GPG
+5	Segurança 5⭐	Fail2ban + UFW + Lynis + Btrfs
+🛡️ Segurança 5 Estrelas (Agora Completa)
+Camada	Proteção	Status
+1	Btrfs Snapshots	Rollback automático ✅
+2	Firewall UFW	Bloqueia intrusões ✅
+3	Fail2ban	Anti brute-force SSH ✅
+4	Password Manager	Credenciais cifradas ✅
+5	Auditoria Lynis	Scan de vulnerabilidades ✅
+
+### 5. Auditoria de Sistema
+- Lynis: ferramenta de auditoria de segurança
+- Comando: `sudo lynis audit system`
+- Verifica permissões, configs, vulnerabilidades
+
+### Backup de Chaves
+Execute regularmente:
+```bash
+archdev-backup-keys
+```
+Faz backup de:
+- Chaves SSH (`~/.ssh`)
+- Chaves GPG (para password manager)
+- Configurações Git
 
 ---
 

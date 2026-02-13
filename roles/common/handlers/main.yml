@@ -1,2 +1,7 @@
 ---
 # Handlers file for common role
+
+- name: Restart Fail2ban
+  systemd:
+    name: fail2ban
+    state: restarted

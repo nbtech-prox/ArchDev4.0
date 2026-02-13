@@ -65,3 +65,73 @@
 # Include AUR tasks
 - include_tasks: aur.yml
   tags: [aur]
+
+# --- Security Hardening ---
+- name: Configure Fail2ban for SSH protection
+  copy:
+    src: fail2ban-ssh.conf
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart Fail2ban
+  tags: [security, fail2ban]
+
+- name: Enable and start Fail2ban
+  systemd:
+    name: fail2ban
+    enabled: yes
+    state: started
+  tags: [security, fail2ban]
+
+- name: Configure sudo timeout (5 minutes)
+  lineinfile:
+    path: /etc/sudoers.d/timeout
+    line: 'Defaults timestamp_timeout=5'
+    create: yes
+    owner: root
+    group: root
+    mode: '0440'
+    validate: 'visudo -cf %s'
+  tags: [security, sudo]
+
+- name: Create security audit notice
+  copy:
+    content: |
+      ================================================
+      🛡️  SEGURANÇA DO SISTEMA - RESUMO
+      ================================================
+      
+      Proteções Ativas:
+      
+      1. Firewall (UFW)
+         - Bloqueia conexões de entrada
+         - Permite apenas SSH (porta 22)
+         - Portas dev abertas: 8000, 8080, 5000, 8550
+      
+      2. Fail2ban
+         - Protege SSH contra brute force
+         - Bloqueia IP após 3 tentativas falhadas
+         - BAN dura 1 hora
+      
+      3. Btrfs + Snapper
+         - Snapshots automáticos
+         - Rollback no boot (Limine)
+         - 3 snapshots mantidos
+      
+      4. Password Manager (pass)
+         - Passwords cifradas com GPG
+         - Integrado com rofi (Super+P)
+      
+      Comandos Úteis:
+         sudo ufw status              # Ver firewall
+         sudo fail2ban-client status  # Ver fail2ban
+         sudo lynis audit system      # Auditoria completa
+         archdev-backup-keys          # Backup chaves
+      
+      ================================================
+    dest: "{{ ansible_user_dir }}/.config/archdev/security-notice.txt"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0644'
+  tags: [security]

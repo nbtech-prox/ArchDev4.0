@@ -47,6 +47,39 @@
 - include_tasks: pass_helper.yml
   tags: [dev, pass]
 
+- name: Copy backup keys helper script
+  copy:
+    src: backup-keys.sh
+    dest: /usr/local/bin/archdev-backup-keys
+    mode: '0755'
+    owner: root
+    group: root
+  tags: [dev, security]
+
+- name: Create backup keys notice
+  copy:
+    content: |
+      ================================================
+      🔐 BACKUP DE CHAVES DE SEGURANÇA
+      ================================================
+      
+      Execute regularmente para fazer backup:
+         archdev-backup-keys
+      
+      Este script faz backup de:
+         - Chaves SSH (~/.ssh)
+         - Chaves GPG (para o password manager)
+         - Configurações Git
+      
+      GUARDE O BACKUP NUM LOCAL SEGURO!
+      
+      ================================================
+    dest: "{{ ansible_user_dir }}/.config/archdev/keys-backup-notice.txt"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0644'
+  tags: [dev, security]
+
 - name: Copy MariaDB setup helper script
   copy:
     src: mariadb-setup.sh
