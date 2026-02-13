@@ -142,7 +142,9 @@ packages_aur:
   - asdf-vm
   - btrfs-assistant
   - limine-snapper-sync-git
+  - spotify
   - spicetify-cli
+  - spicetify-themes-git
   - waypaper
   - imv
   # Catppuccin Theme Packages

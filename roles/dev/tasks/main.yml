@@ -40,3 +40,61 @@
 
 - include_tasks: git_autosync.yml
   tags: [dev, git-autosync]
+
+- include_tasks: docker_helper.yml
+  tags: [dev, docker]
+
+- name: Copy MariaDB setup helper script
+  copy:
+    src: mariadb-setup.sh
+    dest: /usr/local/bin/archdev-mariadb-setup
+    mode: '0755'
+    owner: root
+    group: root
+  tags: [dev, mariadb]
+
+- name: Create post-install notice for MariaDB
+  copy:
+    content: |
+      ================================================
+      🗄️  MARIADB CONFIGURAÇÃO PÓS-INSTALAÇÃO
+      ================================================
+      
+      O MariaDB está instalado e ativo, mas PRECISA de 
+      configuração de segurança.
+      
+      Execute:
+         sudo archdev-mariadb-setup
+      
+      Ou manualmente:
+         sudo mariadb-secure-installation
+      
+      Responda:
+         N - unix_socket auth
+         Y - change root password
+         Y - remove anonymous users  
+         Y - disallow root login remotely
+         Y - remove test database
+         Y - reload privileges
+      
+      ================================================
+    dest: "{{ ansible_user_dir }}/.config/archdev/mariadb-notice.txt"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0644'
+  tags: [dev, mariadb]
+
+- name: Display MariaDB notice
+  debug:
+    msg: |
+      ================================================
+      🗄️  MARIADB CONFIGURAÇÃO PÓS-INSTALAÇÃO
+      ================================================
+      
+      Execute para configurar: 
+         sudo archdev-mariadb-setup
+      
+      Ou manualmente:
+         sudo mariadb-secure-installation
+      
+      ================================================

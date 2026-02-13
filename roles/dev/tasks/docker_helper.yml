@@ -1,0 +1,52 @@
+---
+# --- Docker Helper Tasks ---
+# Informa o usuário sobre necessidade de logout/login
+
+- name: Check if user is in docker group
+  shell: "groups {{ default_user }} | grep -q docker"
+  register: docker_group_check
+  ignore_errors: true
+  changed_when: false
+  tags: [dev, docker]
+
+- name: Create Docker post-install notice
+  copy:
+    content: |
+      ================================================
+      🐳 DOCKER CONFIGURAÇÃO PÓS-INSTALAÇÃO
+      ================================================
+      
+      O seu utilizador foi adicionado ao grupo 'docker'.
+      
+      ⚠️  IMPORTANTE: Faça logout e login novamente
+         (ou reinicie o sistema) para usar Docker sem sudo.
+      
+      Após o login, teste com:
+         docker run hello-world
+      
+      ================================================
+    dest: "{{ ansible_user_dir }}/.config/archdev/docker-notice.txt"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0644'
+  when: docker_group_check.rc == 0
+  tags: [dev, docker]
+
+- name: Display Docker notice
+  debug:
+    msg: |
+      ================================================
+      🐳 DOCKER CONFIGURAÇÃO PÓS-INSTALAÇÃO
+      ================================================
+      
+      O seu utilizador foi adicionado ao grupo 'docker'.
+      
+      ⚠️  IMPORTANTE: Faça logout e login novamente
+         (ou reinicie o sistema) para usar Docker sem sudo.
+      
+      Após o login, teste com:
+         docker run hello-world
+      
+      ================================================
+  when: docker_group_check.rc == 0
+  tags: [dev, docker]

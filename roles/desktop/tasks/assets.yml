@@ -1,24 +1,4 @@
 ---
-# --- Wallpaper Setup ---
-# Wallpapers armazenados em ~/.config/wallpapers/ para não poluir o Desktop
-- name: Create Wallpapers directory (hidden location)
-  file:
-    path: "{{ ansible_user_dir }}/.config/wallpapers"
-    state: directory
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
-    mode: '0755'
-    recurse: yes
-  tags: [desktop, wallpaper]
-
-- name: Copy Wallpapers
-  synchronize:
-    src: "{{ role_path }}/files/wallpapers/"
-    dest: "{{ ansible_user_dir }}/.config/wallpapers/"
-  become: no
-  ignore_errors: yes # Don't fail if source is empty
-  tags: [desktop, wallpaper]
-
 # --- Firefox User.js ---
 - name: Configure Firefox user.js (Catppuccin Mocha)
   copy:
@@ -27,6 +7,10 @@
   when:  ansible_facts['os_family'] == 'Archlinux' # Simplified check
   ignore_errors: yes # Profile might not exist yet if firefox wasn't run
   tags: [desktop, firefox]
+
+# --- Wallpaper Setup ---
+- include_tasks: wallpaper.yml
+  tags: [desktop, wallpaper]
 
 # --- Other Desktop Configs ---
 # GTK, QT, etc.

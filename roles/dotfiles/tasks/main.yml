@@ -18,6 +18,15 @@
     mode: '0755'
   tags: [dotfiles, setup]
 
+- name: Create ArchDev config directory
+  file:
+    path: "{{ ansible_user_dir }}/.config/archdev"
+    state: directory
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0755'
+  tags: [dotfiles, setup]
+
 - name: Sync Configuration Directories (Hyprland, Waybar, Kitty, etc.)
   synchronize:
     src: "{{ role_path }}/files/{{ item }}/"

@@ -40,14 +40,39 @@
   changed_when: false
   tags: [desktop, spicetify]
 
+- name: Check if Spotify is installed
+  command: which spotify
+  register: spotify_check
+  ignore_errors: true
+  changed_when: false
+  tags: [desktop, spicetify]
+
 - name: Set Spotify Permissions for Spicetify
   file:
     path: /opt/spotify
     mode: 'a+wr'
     recurse: yes
-  when: spicetify_check.rc == 0 and ansible_facts['os_family'] == 'Archlinux' # Only if spotify is in /opt
+  when: 
+    - spicetify_check.rc == 0
+    - spotify_check.rc == 0
+    - ansible_facts['os_family'] == 'Archlinux'
   ignore_errors: true
   tags: [desktop, spicetify]
+
+- name: Apply Spicetify Theme (Catppuccin Mocha)
+  shell: |
+    spicetify config current_theme catppuccin
+    spicetify config color_scheme mocha
+    spicetify config inject_css 1 replace_colors 1 overwrite_assets 1
+    spicetify backup apply
+  become: no
+  when: 
+    - spicetify_check.rc == 0
+    - spotify_check.rc == 0
+  ignore_errors: yes
+  tags: [desktop, spicetify]
+  register: spicetify_theme
+  changed_when: "'already backed up' not in spicetify_theme.stderr"
 
 - include_tasks: assets.yml
   tags: [desktop, assets]

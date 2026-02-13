@@ -1,0 +1,50 @@
+---
+# --- Wallpaper Download (Catppuccin Mocha + Arch Linux) ---
+# Baixa um wallpaper oficial Catppuccin se não existir
+
+- name: Ensure wallpapers directory exists
+  file:
+    path: "{{ ansible_user_dir }}/.config/wallpapers"
+    state: directory
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0755'
+  tags: [desktop, wallpaper]
+
+- name: Check if wallpaper exists in repo
+  stat:
+    path: "{{ role_path }}/files/wallpapers/wallpaper.png"
+  register: repo_wallpaper
+  tags: [desktop, wallpaper]
+
+- name: Copy wallpaper from repo if available
+  copy:
+    src: "{{ role_path }}/files/wallpapers/wallpaper.png"
+    dest: "{{ ansible_user_dir }}/.config/wallpapers/wallpaper.png"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0644'
+  when: repo_wallpaper.stat.exists and repo_wallpaper.stat.size > 1000
+  tags: [desktop, wallpaper]
+
+- name: Download Catppuccin Mocha wallpaper (fallback)
+  get_url:
+    url: "https://github.com/catppuccin/wallpapers/raw/main/gradient/mochaowo.png"
+    dest: "{{ ansible_user_dir }}/.config/wallpapers/wallpaper.png"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0644'
+  when: not repo_wallpaper.stat.exists or repo_wallpaper.stat.size < 1000
+  ignore_errors: yes
+  tags: [desktop, wallpaper]
+
+- name: Download Arch Linux Catppuccin wallpaper (alternative)
+  get_url:
+    url: "https://raw.githubusercontent.com/catppuccin/wallpapers/main/misc/catppuccin_triangle.png"
+    dest: "{{ ansible_user_dir }}/.config/wallpapers/wallpaper.png"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: '0644'
+  when: not repo_wallpaper.stat.exists or repo_wallpaper.stat.size < 1000
+  ignore_errors: yes
+  tags: [desktop, wallpaper]
