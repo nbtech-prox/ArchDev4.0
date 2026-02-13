@@ -118,11 +118,22 @@ docker run hello-world
 O Spotify e o tema Catppuccin já estão instalados. Basta abrir o Spotify uma vez para ativar.
 
 ### 4. Password Manager (pass)
-Configura o gestor de passwords (requer chave GPG):
+O `pass` é um gestor de passwords que usa criptografia GPG. Precisas de criar uma chave GPG primeiro:
+
 ```bash
+# Configura automaticamente (cria chave GPG + inicializa pass)
 archdev-pass-setup
+
+# Durante o setup, vai pedir:
+# - Nome real
+# - Email
+# - Password para proteger a chave (guarda bem!)
 ```
-Depois usa `Super+P` para abrir o rofi-pass.
+
+Depois de configurado:
+- `Super+P` → Abrir rofi-pass (procurar passwords)
+- `pass insert github.com/user` → Adicionar nova password (CLI)
+- `pass generate site.com 20` → Gerar password aleatória de 20 chars
 
 ### 5. Backup de Chaves de Segurança (Importante!)
 Faça backup das tuas chaves SSH e GPG:
