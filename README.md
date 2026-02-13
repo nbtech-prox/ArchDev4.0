@@ -81,34 +81,45 @@ chmod +x setup.sh
 4.  Configura a UI (Hyprland, Waybar, Catppuccin).
 5.  Sincroniza os Dotfiles e Scripts.
 
+> 💡 **Nota:** Após a instalação podes apagar a pasta `ArchDev3.0/`. O sistema fica independente.
+
 ---
 
 ## 🔧 Pós-Instalação & Manutenção
 
-Algumas coisas requerem intervenção manual por segurança ou autenticação:
+> ⚠️ **IMPORTANTE:** Após correr `./setup.sh`, executa:
+> ```bash
+> sudo reboot
+> ```
+> O reboot é necessário para o Docker ativar e o Hyprland iniciar corretamente.
 
 ### 1. MariaDB (Segurança)
-O serviço já está ativo, mas deve executar o script de segurança:
+Após o reboot, configura o MariaDB automaticamente:
 ```bash
-sudo mariadb-secure-installation
+sudo archdev-mariadb-setup
 ```
-1.  Enable unix_socket auth? **N** (Importante!)
-2.  Change the root password? **Y** (Defina sua senha de DB).
-3.  Remove anonymous users? **Y**
-4.  Disallow root login remotely? **Y**
-5.  Remove test database? **Y**
-6.  Reload privilege tables? **Y**
+Este script configura tudo automaticamente e gera uma password segura para root.
+
+> 💡 Alternativa manual: `sudo mariadb-secure-installation`
 
 ### 2. Docker
-O seu utilizador já foi adicionado ao grupo `docker`. Precisa apenas de fazer **logout e login** (ou reiniciar) para funcionar sem `sudo`.
-
-### 3. Spicetify (Spotify)
-Abra o Spotify uma vez, faça login, feche-o e execute:
+O teu utilizador já está no grupo `docker`. Após o **reboot**, testa:
 ```bash
-spicetify backup apply
+docker run hello-world
 ```
 
-### 4. Limpeza do Sistema
+### 3. Spotify
+O Spotify e o tema Catppuccin já estão instalados. Basta abrir o Spotify uma vez para ativar.
+
+### 4. Apagar a Pasta de Instalação (Opcional)
+Após a instalação completa, a pasta `ArchDev3.0/` pode ser removida:
+```bash
+cd ..
+rm -rf ArchDev3.0/
+```
+O sistema fica totalmente independente.
+
+### 5. Limpeza do Sistema
 Mantenha o sistema leve:
 *   `paccache -r`: Mantém apenas as 3 últimas versões de pacotes.
 *   `docker system prune -a`: Remove containers e imagens não usados.
