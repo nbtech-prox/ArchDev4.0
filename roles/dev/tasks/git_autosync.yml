@@ -1,13 +1,31 @@
 ---
 # --- Git Auto-Sync ---
+- name: Ensure helpers directory exists
+  file:
+    path: "{{ target_home }}/.config/helpers"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+  tags: [dev, git-autosync, helpers]
+
 - name: Install Git Auto-Sync Script
   copy:
     src: git-autosync.sh
-    dest: /usr/local/bin/git-autosync
+    dest: "{{ target_home }}/.config/helpers/git-autosync.sh"
     mode: '0755'
-    owner: root
-    group: root
-  tags: [dev, git-autosync]
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+  tags: [dev, git-autosync, helpers]
+
+- name: Create symlink for git-autosync
+  file:
+    src: "{{ target_home }}/.config/helpers/git-autosync.sh"
+    dest: /usr/local/bin/git-autosync
+    state: link
+    force: yes
+  become: yes
+  tags: [dev, git-autosync, helpers]
 
 - name: Create Git Auto-Sync Service
   template:
@@ -17,11 +35,11 @@
     group: root
     mode: '0644'
   notify: Restart Git Auto-Sync
-  tags: [dev, git-autosync]
+  tags: [dev, git-autosync, helpers]
 
 - name: Enable Git Auto-Sync Service
   systemd:
     name: git-autosync
     enabled: yes
     state: started
-  tags: [dev, git-autosync]
+  tags: [dev, git-autosync, helpers]

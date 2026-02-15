@@ -9,7 +9,10 @@ set -uo pipefail
 # ============================================
 
 command -v hyprctl &>/dev/null || exit 0
-command -v jq &>/dev/null || exit 0
+if ! command -v jq &>/dev/null; then
+    echo "⚠️ jq não instalado"
+    exit 0
+fi
 
 # ============================================
 # 1. CACHE (evita spam ao hyprctl)

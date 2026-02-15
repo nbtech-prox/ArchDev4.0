@@ -24,12 +24,14 @@ exec-once = wl-paste --watch cliphist store
 exec-once = network-manager-applet & nm-applet --indicator
 exec-once = /usr/lib/polkit-kde-authentication-agent-1
 exec-once = hypridle
-exec-once = wlsunset -T 6500 -t 4500
+# Nota: Night Mode (wlsunset) é controlado pelo botão na Waybar
+exec-once = numlockx on  # Ativar NumLock no arranque
 
 # --- DEFINIÇÃO DE PROGRAMAS ---
 $terminal = kitty
 $fileManager = thunar
 $menu = rofi -show drun
+$ide = antigravity
 
 # --- VARIÁVEIS DE AMBIENTE ---
 # Cursor
@@ -192,8 +194,11 @@ bind = $mainMod SHIFT, N, exec, ~/.config/hypr/scripts/night-mode.sh
 bind = $mainMod, Return, exec, $terminal
 bind = $mainMod, B, exec, firefox
 bind = $mainMod, E, exec, $fileManager
-bind = $mainMod, W, exec, $menu
-bind = $mainMod, P, exec, rofi-pass
+bind = $mainMod, R, exec, $menu
+bind = $mainMod, A, exec, $ide
+bind = $mainMod, P, exec, rofi-rbw
+bind = $mainMod SHIFT, E, exec, rofi -show emoji
+bind = $mainMod SHIFT, C, exec, rofi -show calc
 bind = $mainMod, F, fullscreen
 bind = $mainMod, Q, killactive
 bind = $mainMod, X, exit

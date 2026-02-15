@@ -3,22 +3,35 @@
 # Cores para output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}>>> Iniciando Instalação do ArchDev 3.0...${NC}"
+echo ""
+
+# Verificação de sistema
+if [ ! -f /etc/arch-release ]; then
+    echo -e "${RED}❌ ERRO: Este script é exclusivo para Arch Linux!${NC}"
+    echo ""
+    echo "Detectado: $(cat /etc/os-release 2>/dev/null | grep '^NAME=' | cut -d'"' -f2 || echo 'Sistema desconhecido')"
+    echo ""
+    echo "Para instalar o ArchDev 3.0, você precisa:"
+    echo "  1. Instalar o Arch Linux (recomendado: archinstall)"
+    echo "  2. Escolher: BTRFS + Limine + Minimal"
+    echo "  3. Depois executar este script"
+    echo ""
+    exit 1
+fi
+
+echo -e "${GREEN}✅ Arch Linux detectado${NC}"
+echo ""
 
 # 1. Update e instalação do Ansible (garante que temos o motor)
 if ! command -v ansible &> /dev/null
 then
     echo -e "${BLUE}>>> Instalando Ansible...${NC}"
-    if [ -f /etc/arch-release ]; then
-        sudo pacman -S --noconfirm ansible
-    elif [ -f /etc/debian_version ]; then
-        sudo apt update && sudo apt install -y ansible
-    else
-        echo "Gestor de pacotes não suportado. Instale Ansible manualmente."
-        exit 1
-    fi
+    sudo pacman -S --noconfirm ansible
 else
     echo -e "${GREEN}>>> Ansible já instalado.${NC}"
 fi

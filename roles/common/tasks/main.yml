@@ -133,7 +133,7 @@
          sudo ufw status              # Ver firewall
          sudo fail2ban-client status  # Ver fail2ban
          sudo lynis audit system      # Auditoria completa
-         archdev-backup-keys          # Backup chaves
+         archdev-backup-keys          # Backup chaves (em ~/.config/helpers/)
       
       ================================================
     dest: /etc/system-hardening/security-notice.txt

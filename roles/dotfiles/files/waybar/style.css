@@ -35,8 +35,7 @@
 }
 
 window#waybar {
-  background-color: rgba(30, 30, 46, 0.7); /* Base with transparency */
-  border-bottom: 2px solid rgba(137, 180, 250, 0.2);
+  background-color: transparent;
   transition-property: background-color;
   transition-duration: .5s;
 }
@@ -46,22 +45,21 @@ window#waybar.hidden {
 }
 
 #workspaces {
-  background-color: @surface0;
-  margin: 5px 4px;
-  border-radius: 12px;
-  padding: 0 5px;
+  background-color: transparent;
+  margin: 0 2px;
+  padding: 0 2px;
 }
 
 #workspaces button {
   padding: 0 8px;
-  color: @subtext0;
+  color: @text;
   border-bottom: 3px solid transparent;
   transition: all 0.3s ease;
 }
 
 #workspaces button.active {
-  color: @blue;
-  border-bottom: 3px solid @blue;
+  color: @text;
+  border-bottom: 3px solid @text;
 }
 
 #workspaces button.urgent {
@@ -75,7 +73,7 @@ window#waybar.hidden {
   color: @text;
 }
 
-/* Common style for modules */
+/* Common style for modules - sem fundo */
 #clock,
 #cpu,
 #memory,
@@ -93,35 +91,42 @@ window#waybar.hidden {
 #custom-power,
 #custom-updates,
 #custom-project,
-#bluetooth {
-  padding: 0 12px;
-  margin: 5px 3px;
-  background-color: @surface0;
+#bluetooth,
+#custom-nightmode {
+  padding: 0 10px;
+  margin: 0 2px;
+  background-color: transparent;
   color: @text;
-  border-radius: 12px;
+  font-size: 16px;
 }
 
 #clock {
-  color: @blue;
-  background-color: rgba(137, 180, 250, 0.15);
-  margin-right: 10px;
+  color: @text;
+  font-size: 14px;
 }
 
-#cpu { color: @green; }
-#memory { color: @yellow; }
-#network { color: @teal; }
-#pulseaudio { color: @lavender; }
-#bluetooth { color: @sapphire; }
+#cpu { color: @text; }
+#memory { color: @text; }
+#network { color: @text; }
+#pulseaudio { color: @text; }
+#bluetooth { color: @text; }
 
 #custom-power {
   color: @red;
-  background-color: rgba(243, 139, 168, 0.15);
-  margin-left: 5px;
-  padding: 0 15px;
+}
+
+#custom-nightmode {
+  color: @text;
+  font-size: 16px;
+  padding: 0 12px;
+}
+
+#custom-nightmode.on {
+  color: @yellow;
 }
 
 #custom-project {
-  color: @mauve;
+  color: @text;
   font-style: italic;
   padding-right: 15px;
 }
@@ -129,6 +134,14 @@ window#waybar.hidden {
 #tray {
   padding-left: 10px;
   padding-right: 10px;
+}
+
+#tray > .passive {
+  -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+  -gtk-icon-effect: highlight;
 }
 
 #window {

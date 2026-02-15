@@ -2,6 +2,46 @@
 - name: Core System Setup & Configuration
   hosts: all
   become: true
+  
+  pre_tasks:
+    - name: Validate Arch Linux
+      fail:
+        msg: "❌ Este playbook é exclusivo para Arch Linux. Detectado: {{ ansible_facts['distribution'] }}"
+      when: ansible_facts['distribution'] != 'Archlinux'
+      tags: [always, validation]
+    
+    - name: Validate BTRFS filesystem for Snapper
+      fail:
+        msg: "❌ Snapper requer filesystem BTRFS. Root está usando: {{ ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('desconhecido') }}"
+      when: 
+        - ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('') != 'btrfs'
+      tags: [always, validation, btrfs]
+      ignore_errors: true  # Permite continuar sem Snapper se não for BTRFS
+    
+    - name: Display validation warning
+      debug:
+        msg: "⚠️  Filesystem não é BTRFS - Snapper será ignorado"
+      when: 
+        - ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('') != 'btrfs'
+      tags: [always, validation, btrfs]
+    
+    - name: Validate sudo access
+      command: whoami
+      become: true
+      changed_when: false
+      tags: [always, validation]
+    
+    - name: Display system info
+      debug:
+        msg: |
+          🔧 ArchDev 3.0 - Informações do Sistema:
+          • Distribuição: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}
+          • Kernel: {{ ansible_facts['kernel'] }}
+          • Filesystem Root: {{ ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('desconhecido') }}
+          • Usuário: {{ ansible_env.SUDO_USER | default(ansible_user_id) }}
+          • Arquitetura: {{ ansible_facts['architecture'] }}
+      tags: [always, validation]
+  
   roles:
     - common
     - system

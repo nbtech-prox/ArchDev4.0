@@ -46,8 +46,9 @@
   tags: [desktop, firefox]
 
 # --- Wallpaper Setup ---
+# Descomente abaixo para ativar wallpaper
 #- include_tasks: wallpaper.yml
-  tags: [desktop, wallpaper]
+#  tags: [desktop, wallpaper]
 
 # --- Other Desktop Configs ---
 # GTK, QT, etc.

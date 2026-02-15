@@ -107,20 +107,6 @@
   become: no
   tags: [dotfiles, zsh]
 
-- name: Sync Scripts
-  synchronize:
-    src: "{{ role_path }}/files/scripts/"
-    dest: "{{ target_home }}/.local/bin/" # Assuming executed scripts; or keep in specific folder
-    recursive: yes
-    # delete: yes # Be careful deleting user's bin scripts
-  become: no
-  tags: [dotfiles, scripts]
-
-- name: Make scripts executable
-  shell: "chmod +x {{ target_home }}/.local/bin/*"
-  ignore_errors: yes
-  tags: [dotfiles, scripts]
-
 - name: Ensure theme config directories exist
   file:
     path: "{{ target_home }}/.config/{{ item }}"

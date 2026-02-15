@@ -1,5 +1,19 @@
 ---
 # --------------------------------------------------------
+# Detect filesystem type
+# --------------------------------------------------------
+
+- name: Detect root filesystem type
+  set_fact:
+    root_fstype: "{{ ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('unknown') }}"
+  tags: [system, btrfs, always]
+
+- name: Display filesystem info
+  debug:
+    msg: "📁 Filesystem root detectado: {{ root_fstype }}"
+  tags: [system, btrfs, always]
+
+# --------------------------------------------------------
 # Ensure optimal BTRFS mount options
 # --------------------------------------------------------
 
@@ -9,6 +23,7 @@
     regexp: 'relatime'
     replace: 'noatime'
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs]
 
 # --------------------------------------------------------
@@ -22,6 +37,7 @@
       - snap-pac
     state: present
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs, snapper]
 
 # --------------------------------------------------------
@@ -33,6 +49,7 @@
   args:
     creates: /etc/snapper/configs/root
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs, snapper]
 
 # --------------------------------------------------------
@@ -49,6 +66,7 @@
     - { key: 'NUMBER_LIMIT_IMPORTANT', value: '0' }
     - { key: 'TIMELINE_CREATE', value: 'no' }
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs, snapper]
 
 # --------------------------------------------------------
@@ -61,6 +79,7 @@
     enabled: yes
     state: started
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs, snapper]
 
 # --------------------------------------------------------
@@ -73,6 +92,7 @@
     mode: '0750'
     state: directory
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs, snapper]
 
 # --------------------------------------------------------
@@ -82,6 +102,7 @@
 - name: Cleanup old Snapper snapshots immediately
   command: snapper -c root cleanup number
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs, snapper]
 
 # --------------------------------------------------------
@@ -97,7 +118,9 @@
 - name: Generate Limine snapshot entries
   command: /usr/local/bin/generate-limine-snapshots.sh
   become: yes
-  when: limine_conf.stat.exists
+  when: 
+    - root_fstype == 'btrfs'
+    - limine_conf.stat.exists
   tags: [system, btrfs, boot]
 
 # --------------------------------------------------------
@@ -112,6 +135,7 @@
     group: root
     mode: '0644'
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs]
 
 - name: Install BTRFS scrub systemd timer
@@ -122,6 +146,7 @@
     group: root
     mode: '0644'
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs]
 
 - name: Install BTRFS balance systemd unit
@@ -132,6 +157,7 @@
     group: root
     mode: '0644'
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs]
 
 - name: Install BTRFS balance systemd timer
@@ -142,6 +168,7 @@
     group: root
     mode: '0644'
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs]
 
 - name: Reload systemd daemon
@@ -156,6 +183,7 @@
     enabled: yes
     state: started
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs]
 
 - name: Enable BTRFS balance timer for root mount
@@ -164,6 +192,7 @@
     enabled: yes
     state: started
   become: yes
+  when: root_fstype == 'btrfs'
   tags: [system, btrfs]
 
 # --------------------------------------------------------

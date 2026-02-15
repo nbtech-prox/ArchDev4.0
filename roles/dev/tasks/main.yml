@@ -64,18 +64,99 @@
   tags: [dev, pass]
 
 # --------------------------------------------------------
+# Helpers Directory Structure
+# --------------------------------------------------------
+
+- name: Ensure helpers directory exists
+  file:
+    path: "{{ target_home }}/.config/helpers"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+  tags: [dev, helpers]
+
+- name: Install helpers README
+  copy:
+    src: helpers-readme.txt
+    dest: "{{ target_home }}/.config/helpers/README.txt"
+    mode: '0644'
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+  tags: [dev, helpers]
+
+# --------------------------------------------------------
+# Bitwarden Setup (substitui pass)
+# --------------------------------------------------------
+
+- name: Install Bitwarden setup helper
+  copy:
+    src: bitwarden-setup.sh
+    dest: "{{ target_home }}/.config/helpers/bitwarden-setup.sh"
+    mode: '0755'
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+  tags: [dev, bitwarden, helpers]
+
+- name: Create symlink for bitwarden helper
+  file:
+    src: "{{ target_home }}/.config/helpers/bitwarden-setup.sh"
+    dest: /usr/local/bin/archdev-bitwarden-setup
+    state: link
+    force: yes
+  become: yes
+  tags: [dev, bitwarden, helpers]
+
+- name: Create Bitwarden notice
+  copy:
+    content: |
+      ================================================
+      🔐 BITWARDEN PASSWORD MANAGER
+      ================================================
+      
+      O rbw e rofi-rbw estão instalados.
+      
+      Para configurar:
+         archdev-bitwarden-setup
+         
+      Ou diretamente:
+         ~/.config/helpers/bitwarden-setup.sh
+      
+      Comandos úteis:
+         rbw login          # Fazer login
+         rbw sync           # Sincronizar vault
+         rofi-rbw           # Interface gráfica (Super+P)
+         
+      Atalho: Super+P → Abrir seletor de passwords
+      
+      ================================================
+    dest: "{{ target_home }}/.config/helpers/bitwarden-notice.txt"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  tags: [dev, bitwarden, helpers]
+
+# --------------------------------------------------------
 # Security & Helper Scripts
 # --------------------------------------------------------
 
 - name: Install backup keys helper script
   copy:
     src: backup-keys.sh
-    dest: /usr/local/bin/archdev-backup-keys
+    dest: "{{ target_home }}/.config/helpers/backup-keys.sh"
     mode: '0755'
-    owner: root
-    group: root
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+  tags: [dev, security, helpers]
+
+- name: Create symlink for backup-keys helper
+  file:
+    src: "{{ target_home }}/.config/helpers/backup-keys.sh"
+    dest: /usr/local/bin/archdev-backup-keys
+    state: link
+    force: yes
   become: yes
-  tags: [dev, security]
+  tags: [dev, security, helpers]
 
 - name: Create backup keys notice
   copy:
@@ -86,13 +167,16 @@
       
       Execute regularmente:
          archdev-backup-keys
+         
+      Ou diretamente:
+         ~/.config/helpers/backup-keys.sh
       
       ================================================
-    dest: "{{ target_home }}/.config/keys-backup-notice.txt"
+    dest: "{{ target_home }}/.config/helpers/keys-backup-notice.txt"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     mode: '0644'
-  tags: [dev, security]
+  tags: [dev, security, helpers]
 
 # --------------------------------------------------------
 # MariaDB Setup
@@ -109,22 +193,37 @@
 - name: Install MariaDB setup helper
   copy:
     src: mariadb-setup.sh
-    dest: /usr/local/bin/archdev-mariadb-setup
+    dest: "{{ target_home }}/.config/helpers/mariadb-setup.sh"
     mode: '0755'
-    owner: root
-    group: root
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+  tags: [dev, mariadb, helpers]
+
+- name: Create symlink for mariadb helper
+  file:
+    src: "{{ target_home }}/.config/helpers/mariadb-setup.sh"
+    dest: /usr/local/bin/archdev-mariadb-setup
+    state: link
+    force: yes
   become: yes
-  tags: [dev, mariadb]
+  tags: [dev, mariadb, helpers]
 
 - name: Create MariaDB notice
   copy:
     content: |
       ================================================
-      🗄️  Execute:
-         sudo archdev-mariadb-setup
+      🗄️  MARIADB SETUP
       ================================================
-    dest: "{{ target_home }}/.config/mariadb-notice.txt"
+      
+      Execute:
+         sudo archdev-mariadb-setup
+         
+      Ou diretamente:
+         sudo ~/.config/helpers/mariadb-setup.sh
+      
+      ================================================
+    dest: "{{ target_home }}/.config/helpers/mariadb-notice.txt"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
     mode: '0644'
-  tags: [dev, mariadb]
+  tags: [dev, mariadb, helpers]

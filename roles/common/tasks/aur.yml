@@ -60,6 +60,8 @@
       - hyprpicker
       - asdf-vm
       - antigravity
+      - rbw
+      - rofi-rbw
     aur_optional:
       - nwg-look
       - bibata-cursor-theme

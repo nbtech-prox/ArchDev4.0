@@ -23,7 +23,7 @@ packages_hyprland:
   - dunst
   - grim
   - slurp
-  - wl-clipboard
+  - wl-clipboard  # Fornece wl-copy/wl-paste (clipboard)
   - cliphist
   - playerctl
   - blueman
@@ -59,7 +59,7 @@ packages_terminal:
   - btop
   - fastfetch
   - tree-sitter-cli
-  - jq
+  - jq          # JSON parser (requerido pelos scripts Waybar)
   - pass        # Password store
   - gnupg       # GPG para pass
   - xclip       # Clipboard para pass
@@ -72,6 +72,7 @@ packages_dev_tools:
   - docker
   - docker-compose
   - direnv
+  - antigravity
 
 packages_dev_web:
   - php
@@ -135,6 +136,7 @@ packages_system:
   - firefox
   - mpv
   - inkscape
+  - numlockx  # Para ativar NumLock no arranque
   # Kernel Headers
   - linux-lts-headers
   - linux-headers

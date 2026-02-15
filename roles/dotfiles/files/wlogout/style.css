@@ -3,47 +3,35 @@
 }
 
 window {
-  background-color: rgba(
-    30,
-    30,
-    46,
-    0.9
-  ); /* Catppuccin Mocha Base com transparência */
+  background-color: rgba(30, 30, 46, 0.9);
 }
 
 button {
-  color: #cdd6f4;  /* Catppuccin Mocha Text */
-  background-color: #313244;  /* Catppuccin Mocha Surface0 */
+  color: #cdd6f4;
+  background-color: #313244;
   border-style: solid;
   border-width: 2px;
   border-radius: 10px;
+  border-color: #45475a;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 25%;
-  margin: 10px;
-  transition:
-    box-shadow 0.2s ease-in-out,
-    background-color 0.2s ease-in-out;
+  background-size: 80px;
+  margin: 20px;
+  padding: 40px;
 }
 
-button:focus,
-button:active,
 button:hover {
-  background-color: #89b4fa;  /* Catppuccin Mocha Blue */
-  color: #1e1e2e;  /* Catppuccin Mocha Base */
+  background-color: #89b4fa;
+  color: #1e1e2e;
+  outline-style: none;
+}
+
+button:focus {
   outline-style: none;
 }
 
 #lock {
   background-image: image(url("/usr/share/wlogout/icons/lock.png"));
-}
-
-#logout {
-  background-image: image(url("/usr/share/wlogout/icons/logout.png"));
-}
-
-#suspend {
-  background-image: image(url("/usr/share/wlogout/icons/suspend.png"));
 }
 
 #shutdown {

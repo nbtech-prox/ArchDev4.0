@@ -78,6 +78,15 @@
   ignore_errors: true
   tags: [desktop, spicetify]
 
+- name: Check if Spotify preferences file exists
+  stat:
+    path: "{{ target_home }}/.config/spotify/prefs"
+  register: spotify_prefs
+  when:
+    - spicetify_check.rc == 0
+    - spotify_check.rc == 0
+  tags: [desktop, spicetify]
+
 - name: Apply Spicetify Theme (Catppuccin Mocha)
   shell: |
     spicetify config current_theme catppuccin
@@ -88,7 +97,7 @@
   when: 
     - spicetify_check.rc == 0
     - spotify_check.rc == 0
-    - spotify_prefs.stat.exists
+    - spotify_prefs.stat.exists | default(false)
   tags: [desktop, spicetify]
   register: spicetify_theme
   changed_when: "'already backed up' not in spicetify_theme.stderr"

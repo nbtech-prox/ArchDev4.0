@@ -20,6 +20,7 @@
         "network",
         "bluetooth",
         "pulseaudio",
+        "custom/nightmode",
         "custom/power"
     ],
     "hyprland/window": {
@@ -64,22 +65,22 @@
     },
     "network": {
         "format-wifi": "{icon}",
-        "format-ethernet": "",
-        "format-disconnected": "",
+        "format-ethernet": "󰈀",
+        "format-disconnected": "󰐨",
         "tooltip-format": "{essid}",
         "on-click": "nm-connection-editor",
         "format-icons": [
-            "",
-            "",
-            "",
-            "",
-            ""
+            "󰤭",
+            "󰤟",
+            "󰤢",
+            "󰤥",
+            "󰤨"
         ]
     },
     "bluetooth": {
-        "format": "",
+        "format": "󰂯",
         "format-disabled": "",
-        "format-connected": " {num_connections}",
+        "format-connected": "󰂯 {num_connections}",
         "tooltip-format": "{controller_alias}",
         "tooltip-format-connected": "{controller_alias}\n\n{device_enumerate}",
         "tooltip-format-enumerate-connected": "{device_alias}",
@@ -115,5 +116,12 @@
         "exec": "$HOME/.config/waybar/scripts/project-detect.sh",
         "interval": 2,
         "tooltip": false
+    },
+    "custom/nightmode": {
+        "format": "{}",
+        "exec": "$HOME/.config/waybar/scripts/night-mode-toggle.sh",
+        "interval": 5,
+        "on-click": "$HOME/.config/waybar/scripts/night-mode-toggle.sh toggle",
+        "return-type": "json"
     }
 }

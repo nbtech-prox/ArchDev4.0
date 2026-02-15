@@ -1,7 +1,11 @@
 ---
-- name: Regenerate Initramfs
-  command: mkinitcpio -P
-  become: yes
+# Handlers - Descomente/adicionem quando necessário
+# Exemplo: usar quando modificar /etc/mkinitcpio.conf
+
+# - name: Regenerate Initramfs
+#   command: mkinitcpio -P
+#   become: yes
+#   when: ansible_facts['os_family'] == 'Archlinux'
 
 - name: Restart SDDM
   systemd:
