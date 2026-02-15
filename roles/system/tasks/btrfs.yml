@@ -109,6 +109,17 @@
 # Generate Limine Snapshot Entries (Modern Compatible)
 # --------------------------------------------------------
 
+- name: Install Limine snapshot generator script
+  copy:
+    src: generate-limine-snapshots.sh
+    dest: /usr/local/bin/generate-limine-snapshots.sh
+    mode: '0755'
+    owner: root
+    group: root
+  become: yes
+  when: root_fstype == 'btrfs'
+  tags: [system, btrfs, boot]
+
 - name: Check if Limine config exists
   stat:
     path: /boot/limine/limine.conf
@@ -122,6 +133,36 @@
     - root_fstype == 'btrfs'
     - limine_conf.stat.exists
   tags: [system, btrfs, boot]
+
+# --------------------------------------------------------
+# Snapper Hook - Atualiza Limine automaticamente
+# --------------------------------------------------------
+
+- name: Ensure snapper hooks directory exists
+  file:
+    path: /etc/snapper/hooks
+    state: directory
+    mode: '0755'
+  become: yes
+  when: root_fstype == 'btrfs'
+  tags: [system, btrfs, snapper, limine]
+
+- name: Install snapper hook for Limine sync
+  copy:
+    src: snapper-limine-hook.sh
+    dest: /etc/snapper/hooks/limine-sync.sh
+    mode: '0755'
+    owner: root
+    group: root
+  become: yes
+  when: root_fstype == 'btrfs'
+  tags: [system, btrfs, snapper, limine]
+
+- name: Display limine hook notice
+  debug:
+    msg: "✅ Hook do Snapper instalado - Menu Limine atualizará automaticamente após cada snapshot"
+  when: root_fstype == 'btrfs'
+  tags: [system, btrfs, snapper, limine]
 
 # --------------------------------------------------------
 # BTRFS maintenance: scrub + light balance (systemd timers)
