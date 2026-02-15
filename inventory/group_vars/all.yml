@@ -133,6 +133,8 @@ packages_system:
   - libva-utils
   - vdpauinfo
   # Programs
+  - rofi-rbw
+  - rbw
   - firefox
   - mpv
   - inkscape
