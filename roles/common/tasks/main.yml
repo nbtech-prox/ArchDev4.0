@@ -1,4 +1,5 @@
 ---
+# --- Firewall ---
 - name: Configure UFW Defaults
   ufw:
     state: enabled
@@ -82,17 +83,6 @@
     enabled: yes
     state: started
   tags: [security, fail2ban]
-
-- name: Configure sudo timeout (30 minutes)
-  lineinfile:
-    path: /etc/sudoers.d/timeout
-    line: 'Defaults timestamp_timeout=30'
-    create: yes
-    owner: root
-    group: root
-    mode: '0440'
-    validate: 'visudo -cf %s'
-  tags: [security, sudo]
 
 - name: Ensure security directory exists
   file:

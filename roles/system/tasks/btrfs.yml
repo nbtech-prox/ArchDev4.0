@@ -5,7 +5,7 @@
 
 - name: Detect root filesystem type
   set_fact:
-    root_fstype: "{{ ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('unknown') }}"
+    root_fstype: "{{ ansible_facts['mounts'] | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('unknown') }}"
   tags: [system, btrfs, always]
 
 - name: Display filesystem info

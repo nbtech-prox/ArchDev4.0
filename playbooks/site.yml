@@ -4,6 +4,18 @@
   become: true
   
   pre_tasks:
+    # --- SUDO TIMEOUT (PRIMEIRO DE TUDO - evita prompts de senha) ---
+    - name: Configure sudo timeout (90 minutes)
+      lineinfile:
+        path: /etc/sudoers.d/timeout
+        line: 'Defaults timestamp_timeout=90'
+        create: yes
+        owner: root
+        group: root
+        mode: '0440'
+        validate: 'visudo -cf %s'
+      tags: [always, sudo]
+    
     - name: Validate Arch Linux
       fail:
         msg: "❌ Este playbook é exclusivo para Arch Linux. Detectado: {{ ansible_facts['distribution'] }}"
@@ -12,9 +24,9 @@
     
     - name: Validate BTRFS filesystem for Snapper
       fail:
-        msg: "❌ Snapper requer filesystem BTRFS. Root está usando: {{ ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('desconhecido') }}"
+        msg: "❌ Snapper requer filesystem BTRFS. Root está usando: {{ ansible_facts['mounts'] | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('desconhecido') }}"
       when: 
-        - ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('') != 'btrfs'
+        - ansible_facts['mounts'] | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('') != 'btrfs'
       tags: [always, validation, btrfs]
       ignore_errors: true  # Permite continuar sem Snapper se não for BTRFS
     
@@ -22,7 +34,7 @@
       debug:
         msg: "⚠️  Filesystem não é BTRFS - Snapper será ignorado"
       when: 
-        - ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('') != 'btrfs'
+        - ansible_facts['mounts'] | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('') != 'btrfs'
       tags: [always, validation, btrfs]
     
     - name: Validate sudo access
@@ -37,8 +49,8 @@
           🔧 ArchDev 3.0 - Informações do Sistema:
           • Distribuição: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}
           • Kernel: {{ ansible_facts['kernel'] }}
-          • Filesystem Root: {{ ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('desconhecido') }}
-          • Usuário: {{ ansible_env.SUDO_USER | default(ansible_user_id) }}
+          • Filesystem Root: {{ ansible_facts['mounts'] | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('desconhecido') }}
+          • Usuário: {{ ansible_facts['env']['SUDO_USER'] | default(ansible_facts['user_id']) }}
           • Arquitetura: {{ ansible_facts['architecture'] }}
       tags: [always, validation]
   
