@@ -1,0 +1,7 @@
+[Unit]
+Description=Btrfs scrub on %I
+Documentation=man:btrfs-scrub(8)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/btrfs scrub start -B -R -c 2 %I

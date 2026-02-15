@@ -2,12 +2,11 @@
 Description=Git Auto-Sync Daemon (ArchDev)
 After=network-online.target
 Wants=network-online.target
-RequiresMountsFor={{ projects_dir | default('/mnt/projetos') }}
 
 [Service]
 ExecStart=/usr/local/bin/git-autosync "{{ projects_dir | default('/mnt/projetos') }}"
 Restart=always
-User={{ default_user }}
+User={{ target_user }}
 Environment=PATH=/usr/bin:/usr/local/bin
 
 [Install]

@@ -2,3 +2,9 @@
 - name: Regenerate Initramfs
   command: mkinitcpio -P
   become: yes
+
+- name: Restart SDDM
+  systemd:
+    name: sddm
+    state: restarted
+  become: yes

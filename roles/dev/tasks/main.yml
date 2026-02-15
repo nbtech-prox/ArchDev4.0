@@ -1,27 +1,39 @@
 ---
+# --------------------------------------------------------
+# Install Development Packages
+# --------------------------------------------------------
+
 - name: Install Developer Tools
   pacman:
     name: "{{ packages_dev_tools + packages_terminal }}"
     state: present
+  become: yes
   tags: [dev, tools]
 
 - name: Install Web Dev Stack (PHP/Laravel)
   pacman:
     name: "{{ packages_dev_web }}"
     state: present
+  become: yes
   tags: [dev, web]
 
 - name: Install Python Stack
   pacman:
     name: "{{ packages_dev_python }}"
     state: present
+  become: yes
   tags: [dev, python]
 
-- name: Configure Docker
+# --------------------------------------------------------
+# Docker Setup
+# --------------------------------------------------------
+
+- name: Add user to Docker group
   user:
-    name: "{{ default_user }}"
+    name: "{{ target_user }}"
     groups: docker
     append: yes
+  become: yes
   tags: [dev, docker]
 
 - name: Enable Docker Service
@@ -29,31 +41,40 @@
     name: docker
     enabled: yes
     state: started
+  become: yes
   tags: [dev, docker]
 
-# Include sub-tasks
+# --------------------------------------------------------
+# Include Subtasks
+# --------------------------------------------------------
+
 - include_tasks: php_laravel.yml
   tags: [dev, web]
 
 - include_tasks: python.yml
   tags: [dev, python]
 
+- include_tasks: docker_tuning.yml
+  tags: [dev, docker]
+
 - include_tasks: git_autosync.yml
   tags: [dev, git-autosync]
-
-- include_tasks: docker_helper.yml
-  tags: [dev, docker]
 
 - include_tasks: pass_helper.yml
   tags: [dev, pass]
 
-- name: Copy backup keys helper script
+# --------------------------------------------------------
+# Security & Helper Scripts
+# --------------------------------------------------------
+
+- name: Install backup keys helper script
   copy:
     src: backup-keys.sh
     dest: /usr/local/bin/archdev-backup-keys
     mode: '0755'
     owner: root
     group: root
+  become: yes
   tags: [dev, security]
 
 - name: Create backup keys notice
@@ -63,74 +84,47 @@
       🔐 BACKUP DE CHAVES DE SEGURANÇA
       ================================================
       
-      Execute regularmente para fazer backup:
+      Execute regularmente:
          archdev-backup-keys
       
-      Este script faz backup de:
-         - Chaves SSH (~/.ssh)
-         - Chaves GPG (para o password manager)
-         - Configurações Git
-      
-      GUARDE O BACKUP NUM LOCAL SEGURO!
-      
       ================================================
-    dest: "{{ ansible_user_dir }}/.config/archdev/keys-backup-notice.txt"
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    dest: "{{ target_home }}/.config/keys-backup-notice.txt"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: '0644'
   tags: [dev, security]
 
-- name: Copy MariaDB setup helper script
+# --------------------------------------------------------
+# MariaDB Setup
+# --------------------------------------------------------
+
+- name: Enable MariaDB Service
+  systemd:
+    name: mariadb
+    enabled: yes
+    state: started
+  become: yes
+  tags: [dev, mariadb]
+
+- name: Install MariaDB setup helper
   copy:
     src: mariadb-setup.sh
     dest: /usr/local/bin/archdev-mariadb-setup
     mode: '0755'
     owner: root
     group: root
+  become: yes
   tags: [dev, mariadb]
 
-- name: Create post-install notice for MariaDB
+- name: Create MariaDB notice
   copy:
     content: |
       ================================================
-      🗄️  MARIADB CONFIGURAÇÃO PÓS-INSTALAÇÃO
-      ================================================
-      
-      O MariaDB está instalado e ativo, mas PRECISA de 
-      configuração de segurança.
-      
-      Execute:
+      🗄️  Execute:
          sudo archdev-mariadb-setup
-      
-      Ou manualmente:
-         sudo mariadb-secure-installation
-      
-      Responda:
-         N - unix_socket auth
-         Y - change root password
-         Y - remove anonymous users  
-         Y - disallow root login remotely
-         Y - remove test database
-         Y - reload privileges
-      
       ================================================
-    dest: "{{ ansible_user_dir }}/.config/archdev/mariadb-notice.txt"
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    dest: "{{ target_home }}/.config/mariadb-notice.txt"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: '0644'
   tags: [dev, mariadb]
-
-- name: Display MariaDB notice
-  debug:
-    msg: |
-      ================================================
-      🗄️  MARIADB CONFIGURAÇÃO PÓS-INSTALAÇÃO
-      ================================================
-      
-      Execute para configurar: 
-         sudo archdev-mariadb-setup
-      
-      Ou manualmente:
-         sudo mariadb-secure-installation
-      
-      ================================================

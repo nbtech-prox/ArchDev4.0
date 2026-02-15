@@ -12,11 +12,11 @@
 
 - name: Ensure ASDF shims are in PATH for subsequent tasks
   lineinfile:
-    path: "{{ ansible_user_dir }}/.zshenv"
+    path: "{{ target_home }}/.zshenv"
     line: 'export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"'
     create: yes
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: '0644'
   ignore_errors: yes
   tags: [dev, php, asdf]
@@ -88,6 +88,20 @@
   notify: Restart PHP-FPM
   tags: [dev, php, config]
 
+# --------------------------------------------------------
+# PHP Opcache (Development Optimized)
+# --------------------------------------------------------
+
+- name: Configure PHP opcache for dev
+  copy:
+    src: 99-opcache-dev.ini
+    dest: /etc/php/conf.d/99-opcache-dev.ini
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  tags: [dev, php]
+
 # --- Composer ---
 - name: Install Composer globally
   get_url:
@@ -95,13 +109,6 @@
     dest: /usr/local/bin/composer
     mode: '0755'
   tags: [dev, php, composer]
-
-# --- MariaDB ---
-- name: Initialize MariaDB data directory
-  command: mariadb-install-db --user=mysql --basedir=/usr --datadir=/var/lib/mysql
-  args:
-    creates: /var/lib/mysql/mysql
-  tags: [dev, mariadb]
 
 - name: Start and enable MariaDB service
   systemd:

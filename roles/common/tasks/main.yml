@@ -58,7 +58,6 @@
     - sshd
     - NetworkManager
     - bluetooth
-    - sddm
   ignore_errors: true
   tags: [system, services]
 
@@ -84,16 +83,23 @@
     state: started
   tags: [security, fail2ban]
 
-- name: Configure sudo timeout (5 minutes)
+- name: Configure sudo timeout (30 minutes)
   lineinfile:
     path: /etc/sudoers.d/timeout
-    line: 'Defaults timestamp_timeout=5'
+    line: 'Defaults timestamp_timeout=30'
     create: yes
     owner: root
     group: root
     mode: '0440'
     validate: 'visudo -cf %s'
   tags: [security, sudo]
+
+- name: Ensure security directory exists
+  file:
+   path: /etc/system-hardening
+   state: directory
+   mode: '0755'
+  become: true
 
 - name: Create security audit notice
   copy:
@@ -130,8 +136,9 @@
          archdev-backup-keys          # Backup chaves
       
       ================================================
-    dest: "{{ ansible_user_dir }}/.config/archdev/security-notice.txt"
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    dest: /etc/system-hardening/security-notice.txt
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: '0644'
+  become: true
   tags: [security]

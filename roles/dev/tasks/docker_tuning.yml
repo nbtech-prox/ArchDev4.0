@@ -1,0 +1,21 @@
+---
+- name: Ensure Docker config directory exists
+  file:
+    path: /etc/docker
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: yes
+  tags: [dev, docker]
+
+- name: Configure Docker daemon.json
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  notify: Restart Docker
+  tags: [dev, docker]

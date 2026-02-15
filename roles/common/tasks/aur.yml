@@ -1,5 +1,8 @@
 ---
-# Check if yay is installed
+# ============================================
+# 1. INSTALAÇÃO DO YAY
+# ============================================
+
 - name: Check if yay is installed
   command: which yay
   register: yay_check
@@ -7,20 +10,33 @@
   changed_when: false
   tags: [aur, yay]
 
-# Install yay if not present
+- name: Remove old yay build directory
+  file:
+    path: /tmp/yay
+    state: absent
+  when: yay_check.rc != 0
+
 - name: Clone yay repository
   git:
     repo: https://aur.archlinux.org/yay.git
     dest: /tmp/yay
-  become: no
+  become: false
   when: yay_check.rc != 0
   tags: [aur, yay]
 
-- name: Build and install yay
-  command: makepkg -si --noconfirm
+- name: Build yay package
+  command: makepkg -s --noconfirm --needed
   args:
     chdir: /tmp/yay
-  become: no
+  become: false
+  when: yay_check.rc != 0
+  tags: [aur, yay]
+
+- name: Install built yay package
+  become: true
+  shell: pacman -U --noconfirm /tmp/yay/yay-*.pkg.tar.zst
+  args:
+    executable: /bin/bash
   when: yay_check.rc != 0
   tags: [aur, yay]
 
@@ -31,11 +47,134 @@
   when: yay_check.rc != 0
   tags: [aur, yay]
 
-# Generic task to install AUR packages
-- name: Install AUR packages
-  command: "yay -S --noconfirm {{ item }}"
-  loop: "{{ packages_aur }}"
-  become: no # yay should not be run as root
-  register: aur_install
-  changed_when: "'there is nothing to do' not in aur_install.stdout"
+# ============================================
+# 2. PACOTES AUR - COM VERIFICAÇÃO
+# ============================================
+
+# Divide em essenciais (falha se não instalar) e opcionais (avisa só)
+- name: Define AUR packages lists
+  set_fact:
+    aur_essential:
+      - wlogout
+      - swww
+      - hyprpicker
+      - asdf-vm
+      - antigravity
+    aur_optional:
+      - nwg-look
+      - bibata-cursor-theme
+      - lazydocker
+      - btrfs-assistant
+      - limine-snapper-sync-git
+      - spotify
+      - spicetify-cli
+      - spicetify-themes-git
+      - waypaper
+      - imv
+      - catppuccin-gtk-theme-mocha
+      - catppuccin-cursors-mocha
+      - catppuccin-sddm-theme-mocha
+      - kvantum-theme-catppuccin-git
+  tags: [aur, packages]
+
+# Verifica quais pacotes existem no AUR
+- name: Check AUR package availability (essential)
+  shell: yay -Si {{ item }} &>/dev/null && echo "exists" || echo "missing"
+  loop: "{{ aur_essential }}"
+  register: aur_check_essential
+  changed_when: false
+  failed_when: false
+  become: false
+  tags: [aur, packages]
+
+- name: Check AUR package availability (optional)
+  shell: yay -Si {{ item }} &>/dev/null && echo "exists" || echo "missing"
+  loop: "{{ aur_optional }}"
+  register: aur_check_optional
+  changed_when: false
+  failed_when: false
+  become: false
+  tags: [aur, packages]
+
+# Instala pacotes essenciais (com retry)
+- name: Install essential AUR packages
+  shell: |
+    yay -S --noconfirm --needed --answerdiff None --answerclean None {{ item.item }} 2>&1 || \
+    (sleep 5 && yay -S --noconfirm --needed --answerdiff None --answerclean None {{ item.item }} 2>&1)
+  loop: "{{ aur_check_essential.results }}"
+  when: item.stdout == "exists"
+  become: false
+  register: aur_essential_install
+  failed_when: aur_essential_install.rc != 0
+  ignore_errors: true
+  tags: [aur, packages]
+
+# Instala pacotes opcionais (não falha se não conseguir)
+- name: Install optional AUR packages
+  shell: |
+    yay -S --noconfirm --needed --answerdiff None --answerclean None {{ item.item }} 2>&1 || \
+    (sleep 5 && yay -S --noconfirm --needed --answerdiff None --answerclean None {{ item.item }} 2>&1)
+  loop: "{{ aur_check_optional.results }}"
+  when: item.stdout == "exists"
+  become: false
+  register: aur_optional_install
+  failed_when: false
+  tags: [aur, packages]
+
+# ============================================
+# 3. REPORT DE STATUS
+# ============================================
+
+- name: Report missing essential packages
+  debug:
+    msg: "⚠️  Pacote AUR essencial não encontrado: {{ item.item }}"
+  loop: "{{ aur_check_essential.results }}"
+  when: item.stdout == "missing"
+  tags: [aur, packages]
+
+- name: Report missing optional packages
+  debug:
+    msg: "ℹ️  Pacote AUR opcional não encontrado: {{ item.item }}"
+  loop: "{{ aur_check_optional.results }}"
+  when: item.stdout == "missing"
+  tags: [aur, packages]
+
+- name: Report failed essential installs
+  debug:
+    msg: "❌ Falha ao instalar pacote essencial: {{ item.item }}"
+  loop: "{{ aur_essential_install.results | default([]) }}"
+  when: item.rc is defined and item.rc != 0
+  tags: [aur, packages]
+
+- name: Ensure archdev config directory exists
+  file:
+    path: "{{ target_home }}/.config/archdev"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+  tags: [aur, packages]
+
+- name: Create AUR status file
+  copy:
+    content: |
+      ==========================================
+      AUR PACKAGES STATUS
+      ==========================================
+      
+      ESSENTIALS:
+      {% for pkg in aur_check_essential.results %}
+      {% if pkg.stdout == "exists" %}  ✓ {{ pkg.item }}{% else %}  ✗ {{ pkg.item }} (não encontrado){% endif %}
+      {% endfor %}
+      
+      OPTIONALS:
+      {% for pkg in aur_check_optional.results %}
+      {% if pkg.stdout == "exists" %}  ✓ {{ pkg.item }}{% else %}  ✗ {{ pkg.item }} (não encontrado){% endif %}
+      {% endfor %}
+      
+      ==========================================
+    dest: "{{ target_home }}/.config/archdev/aur-status.txt"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
   tags: [aur, packages]

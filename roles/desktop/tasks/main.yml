@@ -1,38 +1,38 @@
 ---
-# --- SDDM Theme & Config ---
-- name: Configure SDDM Theme (Sugar Candy)
+# --- Install Desktop Packages ---
+- name: Install all desktop package groups
+  pacman:
+   name: "{{ item }}"
+   state: present
+  loop:
+   - "{{ packages_hyprland | default([]) }}"
+   - "{{ packages_theme | default([]) }}"
+   - "{{ packages_terminal | default([]) }}"
+  become: yes
+  tags: [desktop, packages]
+
+# --- SDDM Theme ---
+- name: Ensure SDDM config directory exists
   file:
     path: /etc/sddm.conf.d
     state: directory
     mode: '0755'
+  become: yes
   tags: [desktop, sddm]
 
-- name: Set SDDM Theme
+- name: Set SDDM Theme to Catppuccin Mocha
   copy:
+    dest: /etc/sddm.conf.d/theme.conf
     content: |
       [Theme]
-      Current=catppuccin-mocha
-    dest: /etc/sddm.conf.d/theme.conf
+      Current=catppuccin-mocha-mauve
+  become: yes
+  notify: Restart SDDM
   tags: [desktop, sddm]
 
-# --- Plymouth Theme (Removed by user request) ---
+# NOTA: Firefox profile e user.js configurados em assets.yml
 
-# --- Firefox Profile ---
-- name: Create Firefox Profile Directory
-  file:
-    path: "{{ ansible_user_dir }}/.mozilla/firefox/catppuccin.default"
-    state: directory
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
-    recurse: yes
-  tags: [desktop, firefox]
-
-# We should ideally copy the profile content here if it exists in the repo
-# Since it's in the repo (assets?), we can synchronize it.
-# Check if we have source profile files
-# - synchronize: ...
-
-# --- Spicetify ---
+# --- Spicetify (Seguro) ---
 - name: Check if Spicetify is installed
   command: which spicetify
   register: spicetify_check
@@ -47,15 +47,34 @@
   changed_when: false
   tags: [desktop, spicetify]
 
-- name: Set Spotify Permissions for Spicetify
+# SOLUÇÃO SEGURA: Mudar grupo para o usuário e dar permissão ao grupo
+- name: Set Spotify Permissions for Spicetify (Secure)
   file:
     path: /opt/spotify
-    mode: 'a+wr'
+    owner: root
+    group: "{{ target_user }}"  # Muda o grupo para o teu usuário
+    mode: '0775'                # rwxrwxr-x (dono e grupo podem escrever)
     recurse: yes
   when: 
     - spicetify_check.rc == 0
     - spotify_check.rc == 0
     - ansible_facts['os_family'] == 'Archlinux'
+  ignore_errors: true
+  tags: [desktop, spicetify]
+
+# Alternativa ainda melhor: Usar ACL (Access Control List)
+# Isto dá permissão específica ao teu usuário sem mudar o grupo
+- name: Set Spotify Permissions using ACL (Mais Seguro)
+  ansible.posix.acl:
+    path: /opt/spotify
+    entity: "{{ target_user }}"
+    etype: user
+    permissions: rwx
+    recursive: yes
+    state: present
+  when: 
+    - spicetify_check.rc == 0
+    - spotify_check.rc == 0
   ignore_errors: true
   tags: [desktop, spicetify]
 
@@ -69,10 +88,16 @@
   when: 
     - spicetify_check.rc == 0
     - spotify_check.rc == 0
-  ignore_errors: yes
+    - spotify_prefs.stat.exists
   tags: [desktop, spicetify]
   register: spicetify_theme
   changed_when: "'already backed up' not in spicetify_theme.stderr"
 
 - include_tasks: assets.yml
   tags: [desktop, assets]
+
+- name: Enable display manager (SDDM)
+  systemd:
+   name: sddm
+   enabled: yes
+   state: started

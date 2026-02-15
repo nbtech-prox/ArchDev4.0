@@ -1,7 +1,7 @@
 ---
 project_name: ArchDev3.0
-owner: archdev
-default_user: "{{ ansible_user_id }}"
+target_user: "{{ ansible_env.SUDO_USER | default (ansible_user_id) }}" 
+target_home: "/home/{{ target_user }}"
 
 # --- Official Repositories (Pacman) ---
 
@@ -13,10 +13,13 @@ packages_hyprland:
   - qt5-wayland
   - qt6-wayland
   - kvantum
+  - kvantum-qt5
   - hyprlock
   - hypridle
   - waybar
   - rofi
+  - rofi-calc
+  - rofi-emoji
   - dunst
   - grim
   - slurp
@@ -29,11 +32,10 @@ packages_hyprland:
   - wlsunset  # Filtro de luz azul
   - zathura
   - zathura-pdf-mupdf
-  - swappy  # Editor de screenshots
+  - swappy
 
 packages_theme:
   - papirus-icon-theme
-  - arc-gtk-theme
   - sddm
   - qt5ct
   - qt6ct
@@ -76,7 +78,6 @@ packages_dev_web:
   - php-fpm
   - php-gd
   - php-intl
-  - php-opcache
   - php-redis
   - php-imagick
   - icu
@@ -95,6 +96,12 @@ packages_dev_python:
   - tk
 
 packages_system:
+  - go
+  - which
+  - curl
+  - wget
+  - base-devel
+  - fakeroot
   - thunar
   - tumbler
   - ffmpegthumbnailer
@@ -109,19 +116,23 @@ packages_system:
   - exfatprogs
   - udiskie
   - unzip
+  - zip
+  - p7zip
+  - unrar
   - less
   - nano
   - xdg-user-dirs
   - mousepad
   - pacman-contrib
   - rsync
-  - mkinitcpio-firmware
+  - linux-firmware
   # AMD Graphics
   - mesa
   - vulkan-radeon
   - libva-utils
   - vdpauinfo
   # Programs
+  - firefox
   - mpv
   - inkscape
   # Kernel Headers
@@ -133,30 +144,11 @@ packages_admin:
   - snap-pac
   - ufw
   - openssh
-  - fail2ban  # Proteção contra brute force SSH
-  - lynis     # Auditoria de segurança
+  - fail2ban  
+  - lynis     
 
 # --- Diretórios ---
 projects_dir: "/mnt/projetos"
 
-# --- AUR Packages (Yay) ---
-
-packages_aur:
-  - wlogout
-  - swww
-  - hyprpicker
-  - nwg-look
-  - bibata-cursor-theme
-  - lazydocker
-  - asdf-vm
-  - btrfs-assistant
-  - limine-snapper-sync-git
-  - spotify
-  - spicetify-cli
-  - spicetify-themes-git
-  - waypaper
-  - imv
-  # Catppuccin Theme Packages
-  - catppuccin-gtk-theme-mocha
-  - catppuccin-cursors-mocha
-  - catppuccin-sddm-theme-mocha
+# --- Configuração do Sistema ---
+keyboard_layout: "pt"

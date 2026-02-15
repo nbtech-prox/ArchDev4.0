@@ -3,7 +3,7 @@
 # Informa o usuário sobre necessidade de logout/login
 
 - name: Check if user is in docker group
-  shell: "groups {{ default_user }} | grep -q docker"
+  shell: "groups {{ target_user }} | grep -q docker"
   register: docker_group_check
   ignore_errors: true
   changed_when: false
@@ -25,9 +25,9 @@
          docker run hello-world
       
       ================================================
-    dest: "{{ ansible_user_dir }}/.config/archdev/docker-notice.txt"
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    dest: "{{ target_home }}/.config/docker-notice.txt"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: '0644'
   when: docker_group_check.rc == 0
   tags: [dev, docker]

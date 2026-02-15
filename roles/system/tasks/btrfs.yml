@@ -1,64 +1,187 @@
 ---
-- name: Determine if Limine is the bootloader
-  stat:
-    path: /boot/limine.conf
-  register: limine_conf
-  tags: [system, btrfs, boot]
+# --------------------------------------------------------
+# Ensure optimal BTRFS mount options
+# --------------------------------------------------------
 
-- name: Determine if Limine config is in alternate location
-  stat:
-    path: /boot/limine.cfg
-  register: limine_cfg
-  tags: [system, btrfs, boot]
+- name: Ensure BTRFS mount options use noatime
+  replace:
+    path: /etc/fstab
+    regexp: 'relatime'
+    replace: 'noatime'
+  become: yes
+  tags: [system, btrfs]
 
-- name: Install Limine Snapper Sync (AUR)
-  command: "yay -S --noconfirm limine-snapper-sync-git"
-  become: no
-  when: limine_conf.stat.exists or limine_cfg.stat.exists
-  tags: [system, btrfs, boot]
+# --------------------------------------------------------
+# BTRFS + Snapper Configuration (ArchDev3.0 Production)
+# --------------------------------------------------------
+
+- name: Install Snapper and snap-pac
+  pacman:
+    name:
+      - snapper
+      - snap-pac
+    state: present
+  become: yes
+  tags: [system, btrfs, snapper]
+
+# --------------------------------------------------------
+# Create Snapper Config (Root)
+# --------------------------------------------------------
 
 - name: Configure Snapper for Root
   command: snapper -c root create-config /
   args:
     creates: /etc/snapper/configs/root
+  become: yes
   tags: [system, btrfs, snapper]
 
-- name: Adjust Snapper Retention Policy (Limit 3)
+# --------------------------------------------------------
+# Snapper Retention Policy (ONLY 3 SNAPSHOTS TOTAL)
+# --------------------------------------------------------
+
+- name: Adjust Snapper Retention Policy (Limit 3 total)
   lineinfile:
     path: /etc/snapper/configs/root
-    regexp: "^{{ item.key }}=\".*\""
+    regexp: "^{{ item.key }}="
     line: "{{ item.key }}=\"{{ item.value }}\""
   loop:
     - { key: 'NUMBER_LIMIT', value: '3' }
-    - { key: 'NUMBER_LIMIT_IMPORTANT', value: '2' }
-    - { key: 'TIMELINE_LIMIT_HOURLY', value: '3' }
-    - { key: 'TIMELINE_LIMIT_DAILY', value: '2' }
-    - { key: 'TIMELINE_LIMIT_WEEKLY', value: '0' }
-    - { key: 'TIMELINE_LIMIT_MONTHLY', value: '0' }
-    - { key: 'TIMELINE_LIMIT_YEARLY', value: '0' }
+    - { key: 'NUMBER_LIMIT_IMPORTANT', value: '0' }
+    - { key: 'TIMELINE_CREATE', value: 'no' }
+  become: yes
   tags: [system, btrfs, snapper]
 
-- name: Enable Snapper Timers
+# --------------------------------------------------------
+# Enable Cleanup Timer (NO timeline timer)
+# --------------------------------------------------------
+
+- name: Enable Snapper Cleanup Timer
   systemd:
-    name: "{{ item }}"
+    name: snapper-cleanup.timer
     enabled: yes
     state: started
-  loop:
-    - snapper-timeline.timer
-    - snapper-cleanup.timer
+  become: yes
   tags: [system, btrfs, snapper]
 
-- name: Enable Limine Snapper Sync Service
-  systemd:
-    name: limine-snapper-sync.path
-    enabled: yes
-    state: started
-  when: limine_conf.stat.exists or limine_cfg.stat.exists
-  tags: [system, btrfs, boot]
+# --------------------------------------------------------
+# Ensure correct permissions
+# --------------------------------------------------------
 
 - name: Ensure correct permissions for .snapshots
   file:
     path: /.snapshots
     mode: '0750'
     state: directory
+  become: yes
   tags: [system, btrfs, snapper]
+
+# --------------------------------------------------------
+# Cleanup immediately (important for first run)
+# --------------------------------------------------------
+
+- name: Cleanup old Snapper snapshots immediately
+  command: snapper -c root cleanup number
+  become: yes
+  tags: [system, btrfs, snapper]
+
+# --------------------------------------------------------
+# Generate Limine Snapshot Entries (Modern Compatible)
+# --------------------------------------------------------
+
+- name: Check if Limine config exists
+  stat:
+    path: /boot/limine/limine.conf
+  register: limine_conf
+  tags: [system, btrfs, boot]
+
+- name: Generate Limine snapshot entries
+  command: /usr/local/bin/generate-limine-snapshots.sh
+  become: yes
+  when: limine_conf.stat.exists
+  tags: [system, btrfs, boot]
+
+# --------------------------------------------------------
+# BTRFS maintenance: scrub + light balance (systemd timers)
+# --------------------------------------------------------
+
+- name: Install BTRFS scrub systemd unit
+  copy:
+    src: btrfs-scrub@.service
+    dest: /etc/systemd/system/btrfs-scrub@.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  tags: [system, btrfs]
+
+- name: Install BTRFS scrub systemd timer
+  copy:
+    src: btrfs-scrub@.timer
+    dest: /etc/systemd/system/btrfs-scrub@.timer
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  tags: [system, btrfs]
+
+- name: Install BTRFS balance systemd unit
+  copy:
+    src: btrfs-balance@.service
+    dest: /etc/systemd/system/btrfs-balance@.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  tags: [system, btrfs]
+
+- name: Install BTRFS balance systemd timer
+  copy:
+    src: btrfs-balance@.timer
+    dest: /etc/systemd/system/btrfs-balance@.timer
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  tags: [system, btrfs]
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  become: yes
+  tags: [system, btrfs]
+
+- name: Enable BTRFS scrub timer for root mount
+  systemd:
+    name: "btrfs-scrub@-.timer"
+    enabled: yes
+    state: started
+  become: yes
+  tags: [system, btrfs]
+
+- name: Enable BTRFS balance timer for root mount
+  systemd:
+    name: "btrfs-balance@-.timer"
+    enabled: yes
+    state: started
+  become: yes
+  tags: [system, btrfs]
+
+# --------------------------------------------------------
+# System performance tuning
+# --------------------------------------------------------
+
+- name: Deploy system performance sysctl config
+  copy:
+    src: 99-performance.conf
+    dest: /etc/sysctl.d/99-performance.conf
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  tags: [system, performance]
+
+- name: Apply sysctl settings
+  command: sysctl --system
+  become: yes
+  tags: [system, performance]
+

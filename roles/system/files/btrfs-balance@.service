@@ -1,0 +1,7 @@
+[Unit]
+Description=Btrfs balance (light) on %I
+Documentation=man:btrfs-balance(8)
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/btrfs balance start -dusage=5 -musage=5 %I

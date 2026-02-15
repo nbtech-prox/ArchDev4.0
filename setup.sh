@@ -29,7 +29,7 @@ fi
 
 # 3. Execução do Playbook Principal
 echo -e "${BLUE}>>> Aplicando configurações do ArchDev 3.0 (Isso pode demorar)...${NC}"
-# -K pede a senha de sudo no início para não falhar depois
-ansible-playbook playbooks/site.yml --ask-become-pass
+# -K pede a senha de sudo no início (necessário para yay/AUR)
+ansible-playbook playbooks/site.yml -K
 
 echo -e "${GREEN}>>> Instalação Concluída! Reinicie a sessão para aplicar todas as mudanças.${NC}"

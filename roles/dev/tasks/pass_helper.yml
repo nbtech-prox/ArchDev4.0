@@ -4,19 +4,19 @@
 
 - name: Ensure password store directory exists
   file:
-    path: "{{ ansible_user_dir }}/.password-store"
+    path: "{{ target_home }}/.password-store"
     state: directory
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: '0700'
   tags: [dev, pass]
 
 - name: Ensure gnupg directory exists
   file:
-    path: "{{ ansible_user_dir }}/.gnupg"
+    path: "{{ target_home }}/.gnupg"
     state: directory
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: '0700'
   tags: [dev, pass]
 
@@ -125,9 +125,9 @@
          pass     → Comando CLI
       
       ================================================
-    dest: "{{ ansible_user_dir }}/.config/archdev/pass-notice.txt"
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    dest: "{{ target_home }}/.config/pass-notice.txt"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: '0644'
   tags: [dev, pass]
 

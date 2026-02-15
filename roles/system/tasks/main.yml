@@ -1,7 +1,7 @@
 ---
 - name: Configure Zsh as default shell
   user:
-    name: "{{ default_user }}"
+    name: "{{ target_user }}"
     shell: /usr/bin/zsh
   tags: [system, shell]
 

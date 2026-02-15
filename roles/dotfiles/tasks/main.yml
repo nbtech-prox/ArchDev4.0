@@ -2,40 +2,81 @@
 # --- Dotfiles Configuration ---
 - name: Ensure .config directory exists
   file:
-    path: "{{ ansible_user_dir }}/.config"
+    path: "{{ target_home }}/.config"
     state: directory
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: '0755'
   tags: [dotfiles, setup]
 
 - name: Create local bin directory
   file:
-    path: "{{ ansible_user_dir }}/.local/bin"
+    path: "{{ target_home }}/.local/bin"
     state: directory
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: '0755'
   tags: [dotfiles, setup]
 
-- name: Create ArchDev config directory
+# --- GPU Detection for Hyprland ---
+- name: Detect GPU vendor
+  shell: |
+    if lspci | grep -i 'vga\|3d\|display' | grep -qi 'amd\|ati\|radeon'; then
+      echo "amd"
+    elif lspci | grep -i 'vga\|3d\|display' | grep -qi 'intel'; then
+      echo "intel"
+    elif lspci | grep -i 'vga\|3d\|display' | grep -qi 'nvidia'; then
+      echo "nvidia"
+    else
+      echo "generic"
+    fi
+  register: gpu_detect
+  changed_when: false
+  tags: [dotfiles, config, hypr]
+
+- name: Set GPU vendor fact
+  set_fact:
+    gpu_vendor: "{{ gpu_detect.stdout }}"
+  tags: [dotfiles, config, hypr]
+
+# --- Hyprland Config (Template with GPU detection) ---
+- name: Ensure Hypr directory exists
   file:
-    path: "{{ ansible_user_dir }}/.config/archdev"
+    path: "{{ target_home }}/.config/hypr"
     state: directory
-    owner: "{{ default_user }}"
-    group: "{{ default_user }}"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
     mode: '0755'
-  tags: [dotfiles, setup]
+  tags: [dotfiles, config, hypr]
 
-- name: Sync Configuration Directories (Hyprland, Waybar, Kitty, etc.)
+- name: Deploy Hyprland config (GPU-aware)
+  template:
+    src: hyprland.conf.j2
+    dest: "{{ target_home }}/.config/hypr/hyprland.conf"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  tags: [dotfiles, config, hypr]
+
+- name: Sync Hyprland scripts and other configs
+  synchronize:
+    src: "{{ role_path }}/files/hypr/"
+    dest: "{{ target_home }}/.config/hypr/"
+    recursive: yes
+    delete: no
+    rsync_opts:
+      - "--exclude=hyprland.conf"
+  become: no
+  tags: [dotfiles, config, hypr]
+
+# --- Other Configs ---
+- name: Sync Configuration Directories (Waybar, Kitty, etc.)
   synchronize:
     src: "{{ role_path }}/files/{{ item }}/"
-    dest: "{{ ansible_user_dir }}/.config/{{ item }}/"
+    dest: "{{ target_home }}/.config/{{ item }}/"
     recursive: yes
     delete: yes
-    backup: yes
   loop:
-    - hypr
     - waybar
     - kitty
     - dunst
@@ -51,17 +92,16 @@
 - name: Sync Zsh Configuration
   synchronize:
     src: "{{ role_path }}/files/zsh/"
-    dest: "{{ ansible_user_dir }}/.config/zsh/"
+    dest: "{{ target_home }}/.config/zsh/"
     recursive: yes
     delete: yes
-    backup: yes
   become: no
   tags: [dotfiles, zsh]
 
 - name: Link .zshrc
   file:
-    src: "{{ ansible_user_dir }}/.config/zsh/.zshrc"
-    dest: "{{ ansible_user_dir }}/.zshrc"
+    src: "{{ target_home }}/.config/zsh/.zshrc"
+    dest: "{{ target_home }}/.zshrc"
     state: link
     force: yes
   become: no
@@ -70,13 +110,73 @@
 - name: Sync Scripts
   synchronize:
     src: "{{ role_path }}/files/scripts/"
-    dest: "{{ ansible_user_dir }}/.local/bin/" # Assuming executed scripts; or keep in specific folder
+    dest: "{{ target_home }}/.local/bin/" # Assuming executed scripts; or keep in specific folder
     recursive: yes
     # delete: yes # Be careful deleting user's bin scripts
   become: no
   tags: [dotfiles, scripts]
 
 - name: Make scripts executable
-  shell: "chmod +x {{ ansible_user_dir }}/.local/bin/*"
+  shell: "chmod +x {{ target_home }}/.local/bin/*"
   ignore_errors: yes
   tags: [dotfiles, scripts]
+
+- name: Ensure theme config directories exist
+  file:
+    path: "{{ target_home }}/.config/{{ item }}"
+    state: directory
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0755'
+  loop:
+    - gtk-3.0
+    - gtk-4.0
+    - qt5ct
+    - qt6ct
+    - Kvantum
+  tags: [dotfiles, theme]
+
+- name: Deploy GTK3 config
+  copy:
+    src: gtk-3.0/settings.ini
+    dest: "{{ target_home }}/.config/gtk-3.0/settings.ini"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  tags: [dotfiles, theme]
+
+- name: Deploy GTK4 config
+  copy:
+    src: gtk-4.0/settings.ini
+    dest: "{{ target_home }}/.config/gtk-4.0/settings.ini"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  tags: [dotfiles, theme]
+
+- name: Deploy qt5ct config
+  copy:
+    src: qt5ct/qt5ct.conf
+    dest: "{{ target_home }}/.config/qt5ct/qt5ct.conf"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  tags: [dotfiles, theme]
+
+- name: Deploy qt6ct config
+  copy:
+    src: qt6ct/qt6ct.conf
+    dest: "{{ target_home }}/.config/qt6ct/qt6ct.conf"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  tags: [dotfiles, theme]
+
+- name: Deploy Kvantum config
+  copy:
+    src: Kvantum/kvantum.kvconfig
+    dest: "{{ target_home }}/.config/Kvantum/kvantum.kvconfig"
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+    mode: '0644'
+  tags: [dotfiles, theme]

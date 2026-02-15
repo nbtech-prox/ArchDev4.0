@@ -352,23 +352,21 @@ Scripts instalados automaticamente:
 - Integração rofi: `Super+P`
 - Backup: `archdev-backup-keys`
 
-Thinking
-Pronto! 🎉 Todas as 5 melhorias implementadas + segurança 5 estrelas!
+✅ **Resumo das 5 Camadas de Segurança:**
 
-✅ Melhorias Implementadas
-#	Melhoria	Como Usar
-1	Night Mode Toggle	Super+Shift+N - Liga/desliga filtro de luz azul
-2	Clipboard Manager GUI	Super+V - Interface rofi com histórico
-3	Screenshot Editor	Print ou Shift+Print - Abre Swappy para editar
-4	Backup de Chaves	archdev-backup-keys - Backup SSH + GPG
-5	Segurança 5⭐	Fail2ban + UFW + Lynis + Btrfs
-🛡️ Segurança 5 Estrelas (Agora Completa)
-Camada	Proteção	Status
-1	Btrfs Snapshots	Rollback automático ✅
-2	Firewall UFW	Bloqueia intrusões ✅
-3	Fail2ban	Anti brute-force SSH ✅
-4	Password Manager	Credenciais cifradas ✅
-5	Auditoria Lynis	Scan de vulnerabilidades ✅
+| # | Camada | Proteção | Status |
+|---|--------|----------|--------|
+| 1 | Btrfs + Snapper | Rollback automático no boot | ✅ |
+| 2 | Firewall UFW | Bloqueia intrusões | ✅ |
+| 3 | Fail2ban | Anti brute-force SSH | ✅ |
+| 4 | Password Manager | Credenciais cifradas (GPG) | ✅ |
+| 5 | Auditoria Lynis | Scan de vulnerabilidades | ✅ |
+
+**Funcionalidades Extra:**
+- 🌙 **Night Mode**: `Super+Shift+N` - Toggle filtro de luz azul
+- 📋 **Clipboard GUI**: `Super+V` - Histórico com rofi
+- 📸 **Screenshot Editor**: `Print` ou `Shift+Print` - Abre Swappy
+- 🔐 **Backup de Chaves**: `archdev-backup-keys` - Backup SSH + GPG
 
 ### 5. Auditoria de Sistema
 - Lynis: ferramenta de auditoria de segurança
@@ -384,6 +382,52 @@ Faz backup de:
 - Chaves SSH (`~/.ssh`)
 - Chaves GPG (para password manager)
 - Configurações Git
+
+---
+
+## ⚙️ Personalização
+
+O ArchDev 3.0 é configurável para se adaptar às tuas necessidades:
+
+### Keyboard Layout
+
+Por padrão, o layout é Português (`pt`). Para alterar, edita:
+
+```yaml
+# inventory/group_vars/all.yml
+keyboard_layout: "us"  # ou "br", "es", "fr", etc.
+```
+
+### Deteção Automática de GPU
+
+O Hyprland detecta automaticamente a tua GPU e aplica otimizações:
+
+| GPU | Otimizações Aplicadas |
+|-----|----------------------|
+| AMD | `LIBVA_DRIVER_NAME=radeonsi`, `VDPAU_DRIVER=radeonsi` |
+| Intel | `LIBVA_DRIVER_NAME=i965` |
+| NVIDIA | `LIBVA_DRIVER_NAME=nvidia`, `GBM_BACKEND=nvidia-drm` |
+| Genérica | Defaults seguros |
+
+### Pacotes AUR
+
+Os pacotes AUR estão divididos em:
+
+- **Essenciais**: wlogout, swww, hyprpicker, asdf-vm, antigravity
+- **Opcionais**: spotify, lazydocker, temas Catppuccin, etc.
+
+Se um pacote AUR falhar, o playbook continua (não interrompe a instalação).
+
+### Diretório de Projetos
+
+Por padrão, o git-autosync usa `/mnt/projetos`. Para alterar:
+
+```yaml
+# inventory/group_vars/all.yml
+projects_dir: "/caminho/do/teu/disco"
+```
+
+> **Nota**: Usa um caminho absoluto. Idealmente um disco separado para os teus projetos.
 
 ---
 

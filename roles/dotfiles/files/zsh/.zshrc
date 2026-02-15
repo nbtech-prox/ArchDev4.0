@@ -58,7 +58,6 @@ alias remove='yay -Rns'
 # v2.0 Aliases
 alias nv='nvim'
 alias edit='nvim'
-alias reload-config='cd ~/.dotfiles && stow -R */ && cd -'
 alias lg='lazygit'
 alias ld='lazydocker'
 alias sys='btop'
