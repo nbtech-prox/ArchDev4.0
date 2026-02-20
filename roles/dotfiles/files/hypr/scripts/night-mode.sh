@@ -10,6 +10,6 @@ if [ -n "$PID" ]; then
     dunstify -a "Night Mode" -u normal "☀️ Modo Dia ativado" "Filtro de luz azul desligado"
 else
     # Está desligado, ligar
-    wlsunset -T 6500 -t 4500 &
-    dunstify -a "Night Mode" -u normal "🌙 Modo Noite ativado" "Filtro de luz azul ligado (6500K → 4500K)"
+    wlsunset -l 38.7 -L -9.1 &
+    dunstify -a "Night Mode" -u normal "🌙 Modo Auto retomado" "Filtro dinâmico sincronizado com o pôr-do-sol"
 fi

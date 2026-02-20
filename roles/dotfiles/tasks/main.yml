@@ -69,6 +69,16 @@
   become: no
   tags: [dotfiles, config, hypr]
 
+- name: Ensure Hyprland scripts are executable
+  file:
+    path: "{{ target_home }}/.config/hypr/scripts/{{ item }}"
+    mode: '0755'
+  loop:
+    - clipboard-manager.sh
+    - night-mode.sh
+  become: no
+  tags: [dotfiles, config, hypr]
+
 # --- Other Configs ---
 - name: Sync Configuration Directories (Waybar, Kitty, etc.)
   synchronize:

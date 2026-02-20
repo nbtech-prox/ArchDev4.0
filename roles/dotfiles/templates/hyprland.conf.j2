@@ -24,7 +24,9 @@ exec-once = wl-paste --watch cliphist store
 exec-once = network-manager-applet & nm-applet --indicator
 exec-once = /usr/lib/polkit-kde-authentication-agent-1
 exec-once = hypridle
-# Nota: Night Mode (wlsunset) é controlado pelo botão na Waybar
+# Night Mode Dinâmico (Filtro de luz azul adaptativo à hora de Lisboa: 38.7,-9.1)
+exec-once = wlsunset -l 38.7 -L -9.1 &
+# Nota: O Night Mode pode ser forçado/desligado com Super+Shift+N
 exec-once = numlockx on  # Ativar NumLock no arranque
 
 # --- DEFINIÇÃO DE PROGRAMAS ---

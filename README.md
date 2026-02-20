@@ -370,7 +370,7 @@ Scripts instalados automaticamente:
 | 5 | Auditoria Lynis | Analisador de vulnerabilidades avançado | ✅ |
 
 **Funcionalidades Extra de Produtividade & Utilidades:**
-- 🌙 **Night Mode**: `Super+Shift+N` - Toggle filtro de luz azul
+- 🌙 **Night Mode Automático**: Adapta-se ao pôr-do-sol local. Usa `Super+Shift+N` para pausar temporariamente as cores (útil para edição de imagem).
 - 📋 **Clipboard GUI**: `Super+V` - Histórico com rofi
 - 📸 **Screenshot Editor**: `Print` ou `Shift+Print` - Abre Swappy
 - 🔐 **Backup de Chaves**: Script `archdev-backup-keys` para assistente na recolha e backup manual para PEN USB ou Cloud das tuas chaves cruciais (`~/.ssh`), chaves `GPG`, e configs `Git`.
