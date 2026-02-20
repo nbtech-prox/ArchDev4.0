@@ -11,15 +11,15 @@
     mode: '0755'
   tags: [desktop, wallpaper]
 
-- name: Check if wallpaper exists in repo
+- name: Check if custom arch wallpaper exists in repo
   stat:
-    path: "{{ role_path }}/files/wallpapers/wallpaper.png"
+    path: "{{ role_path }}/files/wallpapers/arch.png"
   register: repo_wallpaper
   tags: [desktop, wallpaper]
 
-- name: Copy wallpaper from repo if available
+- name: Copy arch wallpaper from repo to expected config path
   copy:
-    src: "{{ role_path }}/files/wallpapers/wallpaper.png"
+    src: "{{ role_path }}/files/wallpapers/arch.png"
     dest: "{{ target_home }}/.config/wallpapers/wallpaper.png"
     owner: "{{ target_user }}"
     group: "{{ target_user }}"
