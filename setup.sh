@@ -40,7 +40,17 @@ fi
 # echo -e "${BLUE}>>> Instalando roles do Ansible Galaxy...${NC}"
 # ansible-galaxy install -r roles/requirements.yml
 
-# 3. Execução do Playbook Principal
+# 3. Snapshot de Segurança BTRFS (Prevenção)
+echo -e "${BLUE}>>> Verificando sistema de ficheiros para Snapshot de segurança...${NC}"
+if command -v snapper &> /dev/null && sudo snapper -c root get-config &> /dev/null; then
+    echo -e "${YELLOW}>>> Criando Snapshot BTRFS (Pre-ArchDev3-Setup)...${NC}"
+    sudo snapper -c root create --description "Pre-ArchDev3-Setup" --cleanup-algorithm number
+else
+    echo -e "${YELLOW}>>> Snapper não detetado/configurado. Snapshot inicial ignorado (será configurado pelo Ansible).${NC}"
+fi
+echo ""
+
+# 4. Execução do Playbook Principal
 echo -e "${BLUE}>>> Aplicando configurações do ArchDev 3.0 (Isso pode demorar)...${NC}"
 # -K pede a senha de sudo no início (necessário para yay/AUR)
 ansible-playbook playbooks/site.yml -K
