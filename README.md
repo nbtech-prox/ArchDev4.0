@@ -80,6 +80,8 @@ chmod +x setup.sh
 ./setup.sh
 ```
 
+> ⚠️ **Aviso:** O script irá pedir a tua password de administrador (sudo) no início da execução (`-K`) para elevar privilégios e instalar todos os pacotes necessários.
+
 **O que o script faz sozinho:**
 1.  Verifica e instala o Ansible.
 2.  Instala todos os pacotes (Pacman + AUR).
@@ -151,10 +153,9 @@ rm -rf ArchDev3.0/
 O sistema fica totalmente independente.
 
 ### 7. Limpeza do Sistema
-Mantenha o sistema leve:
-*   `paccache -r`: Mantém apenas as 3 últimas versões de pacotes.
-*   `docker system prune -a`: Remove containers e imagens não usados.
-*   `sudo lynis audit system`: Auditoria de segurança periódica.
+Mantenha o sistema leve libertando espaço em disco:
+*   `paccache -r`: Mantém apenas as 3 últimas versões de pacotes pacman/AUR.
+*   `docker system prune -a`: Remove containers, volumes e imagens Docker não em uso.
 
 ---
 
@@ -186,10 +187,12 @@ bubble l
 
 ## 🔄 Automação Git (Sync Offline)
 
-Se ativar esta opção, o serviço `git-autosync` corre em background:
-*   Monitoriza a sua pasta de projetos (definida na instalação).
-*   A cada 5 minutos, verifica se há internet.
-*   Se houver, faz `git push` automático de todos os repositórios. Perfeito para trabalhar offline e sincronizar assim que apanhar Wi-Fi.
+O teu ambiente inclui o serviço `git-autosync` que é instalado e corre em background por padrão:
+*   Monitoriza a tua pasta de projetos (configurada no `inventory/group_vars/all.yml` via `projects_dir`).
+*   A cada 5 minutos, verifica de forma silenciosa se há conexão à internet.
+*   Se houver, faz `git push` automático de todos os teus repositórios com alterações não sincronizadas. Perfeito para trabalhar em movimento e sincronizar o código assim que apanhas Wi-Fi.
+
+> 💡 **Dica:** Para desativar/parar temporariamente o sync automático, usa: `sudo systemctl stop git-autosync`
 
 ---
 
@@ -331,7 +334,7 @@ Scripts instalados automaticamente:
 ## 🛡️ Segurança (5 Camadas de Proteção)
 
 ### 1. Btrfs + Snapper (Recuperação)
-- Snapshots automáticos antes de cada instalação
+- Snapshots automáticos antes de cada alteração
 - Retenção: 3 snapshots (não enche o disco)
 - Rollback no boot menu (Limine)
 - **Automático** - não precisas fazer nada
@@ -350,38 +353,27 @@ Scripts instalados automaticamente:
 ### 4. Password Manager (Proteção de Credenciais)
 - `pass` + GPG: passwords cifradas localmente
 - Integração rofi: `Super+P`
-- Backup: `archdev-backup-keys`
+
+### 5. Auditoria de Sistema (Lynis)
+- Lynis: ferramenta de auditoria de segurança
+- Comando: `sudo lynis audit system`
+- Verifica configurações do sistema, permissões incorretas e pacotes vulneráveis.
 
 ✅ **Resumo das 5 Camadas de Segurança:**
 
 | # | Camada | Proteção | Status |
 |---|--------|----------|--------|
 | 1 | Btrfs + Snapper | Rollback automático no boot | ✅ |
-| 2 | Firewall UFW | Bloqueia intrusões | ✅ |
-| 3 | Fail2ban | Anti brute-force SSH | ✅ |
+| 2 | Firewall UFW | Bloqueia intrusões e portas não requeridas | ✅ |
+| 3 | Fail2ban | Anti brute-force SSH e web apps | ✅ |
 | 4 | Password Manager | Credenciais cifradas (GPG) | ✅ |
-| 5 | Auditoria Lynis | Scan de vulnerabilidades | ✅ |
+| 5 | Auditoria Lynis | Analisador de vulnerabilidades avançado | ✅ |
 
-**Funcionalidades Extra:**
+**Funcionalidades Extra de Produtividade & Utilidades:**
 - 🌙 **Night Mode**: `Super+Shift+N` - Toggle filtro de luz azul
 - 📋 **Clipboard GUI**: `Super+V` - Histórico com rofi
 - 📸 **Screenshot Editor**: `Print` ou `Shift+Print` - Abre Swappy
-- 🔐 **Backup de Chaves**: `archdev-backup-keys` - Backup SSH + GPG
-
-### 5. Auditoria de Sistema
-- Lynis: ferramenta de auditoria de segurança
-- Comando: `sudo lynis audit system`
-- Verifica permissões, configs, vulnerabilidades
-
-### Backup de Chaves
-Execute regularmente:
-```bash
-archdev-backup-keys
-```
-Faz backup de:
-- Chaves SSH (`~/.ssh`)
-- Chaves GPG (para password manager)
-- Configurações Git
+- 🔐 **Backup de Chaves**: Script `archdev-backup-keys` para assistente na recolha e backup manual para PEN USB ou Cloud das tuas chaves cruciais (`~/.ssh`), chaves `GPG`, e configs `Git`.
 
 ---
 
