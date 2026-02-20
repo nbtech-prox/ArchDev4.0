@@ -46,7 +46,7 @@
     - name: Display system info
       debug:
         msg: |
-          🔧 ArchDev 3.0 - Informações do Sistema:
+          🔧 ArchDev 4.0 - Informações do Sistema:
           • Distribuição: {{ ansible_facts['distribution'] }} {{ ansible_facts['distribution_version'] }}
           • Kernel: {{ ansible_facts['kernel'] }}
           • Filesystem Root: {{ ansible_facts['mounts'] | selectattr('mount', 'equalto', '/') | map(attribute='fstype') | first | default('desconhecido') }}
@@ -57,6 +57,7 @@
   roles:
     - common
     - system
+    - distrobox
     - desktop
     - dev
     - dotfiles

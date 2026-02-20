@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}>>> Iniciando Instalação do ArchDev 3.0...${NC}"
+echo -e "${BLUE}>>> Iniciando Instalação do ArchDev 4.0...${NC}"
 echo ""
 
 # Verificação de sistema
@@ -16,7 +16,7 @@ if [ ! -f /etc/arch-release ]; then
     echo ""
     echo "Detectado: $(cat /etc/os-release 2>/dev/null | grep '^NAME=' | cut -d'"' -f2 || echo 'Sistema desconhecido')"
     echo ""
-    echo "Para instalar o ArchDev 3.0, você precisa:"
+    echo "Para instalar o ArchDev 4.0, você precisa:"
     echo "  1. Instalar o Arch Linux (recomendado: archinstall)"
     echo "  2. Escolher: BTRFS + Limine + Minimal"
     echo "  3. Depois executar este script"
@@ -43,15 +43,15 @@ fi
 # 3. Snapshot de Segurança BTRFS (Prevenção)
 echo -e "${BLUE}>>> Verificando sistema de ficheiros para Snapshot de segurança...${NC}"
 if command -v snapper &> /dev/null && sudo snapper -c root get-config &> /dev/null; then
-    echo -e "${YELLOW}>>> Criando Snapshot BTRFS (Pre-ArchDev3-Setup)...${NC}"
-    sudo snapper -c root create --description "Pre-ArchDev3-Setup" --cleanup-algorithm number
+    echo -e "${YELLOW}>>> Criando Snapshot BTRFS (Pre-ArchDev4-Setup)...${NC}"
+    sudo snapper -c root create --description "Pre-ArchDev4-Setup" --cleanup-algorithm number
 else
     echo -e "${YELLOW}>>> Snapper não detetado/configurado. Snapshot inicial ignorado (será configurado pelo Ansible).${NC}"
 fi
 echo ""
 
 # 4. Execução do Playbook Principal
-echo -e "${BLUE}>>> Aplicando configurações do ArchDev 3.0 (Isso pode demorar)...${NC}"
+echo -e "${BLUE}>>> Aplicando configurações do ArchDev 4.0 (Isso pode demorar)...${NC}"
 # -K pede a senha de sudo no início (necessário para yay/AUR)
 ansible-playbook playbooks/site.yml -K
 

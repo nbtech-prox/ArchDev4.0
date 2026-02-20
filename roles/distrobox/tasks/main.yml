@@ -1,0 +1,45 @@
+---
+# --- Distrobox & Podman Configuration ---
+- name: Install Podman and Distrobox
+  pacman:
+    name:
+      - podman
+      - distrobox
+    state: present
+  become: yes
+  tags: [system, distrobox, podman]
+
+- name: Check if arch-dev-box exists
+  shell: distrobox list | grep -q "arch-dev-box"
+  register: box_exists
+  failed_when: false
+  changed_when: false
+  become: no
+  tags: [system, distrobox]
+
+- name: Create arch-dev-box Distrobox container
+  command: distrobox create -n arch-dev-box -i archlinux:latest --yes
+  when: box_exists.rc != 0
+  become: no
+  tags: [system, distrobox]
+
+- name: Check if yay is installed in arch-dev-box
+  shell: distrobox-enter arch-dev-box -- command -v yay
+  register: yay_check
+  failed_when: false
+  changed_when: false
+  become: no
+  tags: [system, distrobox]
+
+- name: Initialize arch-dev-box development tools (base-devel & git)
+  command: distrobox-enter arch-dev-box -- sudo pacman -S --noconfirm base-devel git
+  when: yay_check.rc != 0
+  become: no
+  tags: [system, distrobox]
+
+- name: Install yay inside arch-dev-box
+  shell: |
+    distrobox-enter arch-dev-box -- bash -c 'git clone https://aur.archlinux.org/yay-bin.git /tmp/yay-bin && cd /tmp/yay-bin && makepkg -si --noconfirm'
+  when: yay_check.rc != 0
+  become: no
+  tags: [system, distrobox]
