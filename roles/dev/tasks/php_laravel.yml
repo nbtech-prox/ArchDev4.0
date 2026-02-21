@@ -1,190 +1,127 @@
 ---
 # --- ASDF Setup for PHP Version Management ---
-# Permite usar 'bubble l' para criar ambientes PHP isolados com versões específicas
-- name: Install ASDF PHP plugin
+- name: Install ASDF PHP plugin inside Distrobox
   shell: |
-    . /opt/asdf-vm/asdf.sh
-    asdf plugin add php https://github.com/asdf-community/asdf-php.git || true
-  args:
-    executable: /bin/bash
+    distrobox-enter arch-dev-box -- bash -c '. /opt/asdf-vm/asdf.sh && asdf plugin add php https://github.com/asdf-community/asdf-php.git || true'
   ignore_errors: yes
   tags: [dev, php, asdf]
 
-- name: Ensure ASDF shims are in PATH for subsequent tasks
-  lineinfile:
-    path: "{{ target_home }}/.zshenv"
-    line: 'export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"'
-    create: yes
-    owner: "{{ target_user }}"
-    group: "{{ target_user }}"
-    mode: '0644'
-  ignore_errors: yes
-  tags: [dev, php, asdf]
-
-- name: Set PHP timezone
-  lineinfile:
-    path: /etc/php/php.ini
-    regexp: ';date.timezone ='
-    line: 'date.timezone = UTC'
+- name: Set PHP timezone inside Distrobox
+  shell: |
+    distrobox-enter arch-dev-box -- sudo sed -i 's/;date.timezone =/date.timezone = UTC/g' /etc/php/php.ini
   tags: [dev, php]
 
 # --- Enable Extensions ---
-- name: Enable PHP extensions
-  lineinfile:
-    path: /etc/php/php.ini
-    regexp: ';extension={{ item }}'
-    line: 'extension={{ item }}'
-  loop:
-    - bcmath
-    - intl
-    - pdo_mysql
-    - sqlite3
-    - curl
-    - iconv
-    - zip
-    - mysqli
-    - openssl
-    - gd
-    - bz2
-    - exif
-    - fileinfo
-    - ftp
-    - gettext
-    - mbstring
-  notify: Restart PHP-FPM
+- name: Enable PHP extensions inside Distrobox
+  shell: |
+    for ext in bcmath intl pdo_mysql sqlite3 curl iconv zip mysqli openssl gd bz2 exif fileinfo ftp gettext mbstring; do
+      distrobox-enter arch-dev-box -- sudo sed -i "s/;extension=$ext/extension=$ext/g" /etc/php/php.ini
+    done
   tags: [dev, php, extensions]
 
 # --- PHP Development Configuration ---
-- name: Configure PHP for Development (Laravel Optimized)
-  lineinfile:
-    path: /etc/php/php.ini
-    regexp: '{{ item.regexp }}'
-    line: '{{ item.line }}'
-  loop:
-    # Memory
-    - { regexp: '^memory_limit\s*=.*', line: 'memory_limit = 512M' }
-    # File Uploads
-    - { regexp: '^upload_max_filesize\s*=.*', line: 'upload_max_filesize = 128M' }
-    - { regexp: '^post_max_size\s*=.*', line: 'post_max_size = 128M' }
-    - { regexp: '^max_file_uploads\s*=.*', line: 'max_file_uploads = 20' }
-    # Execution
-    - { regexp: '^max_execution_time\s*=.*', line: 'max_execution_time = 300' }
-    - { regexp: '^max_input_time\s*=.*', line: 'max_input_time = 300' }
-    - { regexp: '^max_input_vars\s*=.*', line: 'max_input_vars = 5000' }
-    # Error Reporting (Development)
-    - { regexp: '^error_reporting\s*=.*', line: 'error_reporting = E_ALL' }
-    - { regexp: '^display_errors\s*=.*', line: 'display_errors = On' }
-    - { regexp: '^display_startup_errors\s*=.*', line: 'display_startup_errors = On' }
-    - { regexp: '^log_errors\s*=.*', line: 'log_errors = On' }
-    # OPcache (Performance)
-    - { regexp: '^;opcache.enable\s*=.*', line: 'opcache.enable = 1' }
-    - { regexp: '^;opcache.memory_consumption\s*=.*', line: 'opcache.memory_consumption = 256' }
-    - { regexp: '^;opcache.max_accelerated_files\s*=.*', line: 'opcache.max_accelerated_files = 20000' }
-    - { regexp: '^;opcache.revalidate_freq\s*=.*', line: 'opcache.revalidate_freq = 0' }
-    - { regexp: '^;opcache.validate_timestamps\s*=.*', line: 'opcache.validate_timestamps = 1' }
-    # Realpath Cache
-    - { regexp: '^;realpath_cache_size\s*=.*', line: 'realpath_cache_size = 4096K' }
-    - { regexp: '^;realpath_cache_ttl\s*=.*', line: 'realpath_cache_ttl = 600' }
-  notify: Restart PHP-FPM
+- name: Configure PHP for Development inside Distrobox
+  shell: |
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^memory_limit\s*=.*/memory_limit = 512M/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^upload_max_filesize\s*=.*/upload_max_filesize = 128M/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^post_max_size\s*=.*/post_max_size = 128M/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^max_file_uploads\s*=.*/max_file_uploads = 20/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^max_execution_time\s*=.*/max_execution_time = 300/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^max_input_time\s*=.*/max_input_time = 300/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^max_input_vars\s*=.*/max_input_vars = 5000/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^error_reporting\s*=.*/error_reporting = E_ALL/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^display_errors\s*=.*/display_errors = On/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^display_startup_errors\s*=.*/display_startup_errors = On/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^log_errors\s*=.*/log_errors = On/' /etc/php/php.ini
+    # OPcache
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^;opcache.enable\s*=.*/opcache.enable = 1/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^;opcache.memory_consumption\s*=.*/opcache.memory_consumption = 256/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^;opcache.max_accelerated_files\s*=.*/opcache.max_accelerated_files = 20000/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^;opcache.revalidate_freq\s*=.*/opcache.revalidate_freq = 0/' /etc/php/php.ini
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^;opcache.validate_timestamps\s*=.*/opcache.validate_timestamps = 1/' /etc/php/php.ini
   tags: [dev, php, config]
 
 # --------------------------------------------------------
 # PHP Opcache (Development Optimized)
 # --------------------------------------------------------
 
-- name: Configure PHP opcache for dev
-  copy:
-    src: 99-opcache-dev.ini
-    dest: /etc/php/conf.d/99-opcache-dev.ini
-    owner: root
-    group: root
-    mode: '0644'
-  become: yes
+- name: Configure PHP opcache for dev inside Distrobox
+  shell: |
+    distrobox-enter arch-dev-box -- sudo bash -c 'cat > /etc/php/conf.d/99-opcache-dev.ini << EOF
+    opcache.memory_consumption=256
+    opcache.interned_strings_buffer=16
+    opcache.max_accelerated_files=20000
+    opcache.revalidate_freq=0
+    opcache.validate_timestamps=1
+    opcache.fast_shutdown=1
+    EOF'
   tags: [dev, php]
 
 # --- Composer ---
-- name: Install Composer globally
-  get_url:
-    url: https://getcomposer.org/composer-stable.phar
-    dest: /usr/local/bin/composer
-    mode: '0755'
+- name: Install Composer globally inside Distrobox
+  shell: |
+    distrobox-enter arch-dev-box -- sudo bash -c 'curl -sS https://getcomposer.org/composer-stable.phar -o /usr/local/bin/composer && chmod +x /usr/local/bin/composer'
   tags: [dev, php, composer]
 
-- name: Start and enable MariaDB service
-  systemd:
-    name: mariadb
-    enabled: yes
-    state: started
+- name: Enable MariaDB service inside Distrobox
+  shell: distrobox-enter arch-dev-box -- sudo systemctl enable --now mariadb
+  ignore_errors: yes
   tags: [dev, mariadb]
 
-- name: Apply MariaDB Custom Optimization
-  copy:
-    src: mariadb_custom.cnf
-    dest: /etc/my.cnf.d/z-custom-archdev.cnf
-    owner: root
-    group: root
-    mode: '0644'
-  notify: Restart MariaDB
+- name: Apply MariaDB Custom Optimization inside Distrobox
+  shell: |
+    distrobox-enter arch-dev-box -- bash -c "cat > /tmp/z-custom-archdev.cnf << 'EOF'
+    $(cat {{ role_path }}/files/mariadb_custom.cnf)
+    EOF"
+    distrobox-enter arch-dev-box -- sudo mv /tmp/z-custom-archdev.cnf /etc/my.cnf.d/z-custom-archdev.cnf
+    distrobox-enter arch-dev-box -- sudo chown root:root /etc/my.cnf.d/z-custom-archdev.cnf
+    distrobox-enter arch-dev-box -- sudo systemctl restart mariadb || true
   tags: [dev, mariadb]
 
 # --- Apache & phpMyAdmin ---
-- name: Install Apache phpMyAdmin Config
-  copy:
-    src: apache_phpmyadmin.conf
-    dest: /etc/httpd/conf/extra/phpmyadmin.conf
-    owner: root
-    group: root
-    mode: '0644'
+- name: Install Apache phpMyAdmin Config inside Distrobox
+  shell: |
+    distrobox-enter arch-dev-box -- bash -c "cat > /tmp/phpmyadmin.conf << 'EOF'
+    $(cat {{ role_path }}/files/apache_phpmyadmin.conf)
+    EOF"
+    distrobox-enter arch-dev-box -- sudo mv /tmp/phpmyadmin.conf /etc/httpd/conf/extra/phpmyadmin.conf
+    distrobox-enter arch-dev-box -- sudo chown root:root /etc/httpd/conf/extra/phpmyadmin.conf
   tags: [dev, apache, phpmyadmin]
 
-- name: Install phpMyAdmin Config
-  copy:
-    src: phpmyadmin_config.inc.php
-    dest: /etc/webapps/phpmyadmin/config.inc.php
-    owner: root
-    group: http
-    mode: '0640'
+- name: Install phpMyAdmin Config inside Distrobox
+  shell: |
+    distrobox-enter arch-dev-box -- bash -c "cat > /tmp/config.inc.php << 'EOF'
+    $(cat {{ role_path }}/files/phpmyadmin_config.inc.php)
+    EOF"
+    distrobox-enter arch-dev-box -- sudo mv /tmp/config.inc.php /etc/webapps/phpmyadmin/config.inc.php
+    distrobox-enter arch-dev-box -- sudo chown root:http /etc/webapps/phpmyadmin/config.inc.php
+    distrobox-enter arch-dev-box -- sudo chmod 0640 /etc/webapps/phpmyadmin/config.inc.php
   tags: [dev, phpmyadmin]
 
 - name: Generate Random Blowfish Secret for phpMyAdmin
   shell: openssl rand -base64 32 | tr -d /=+ | cut -c -32
   register: blowfish_secret
   changed_when: false
+  become: no
   tags: [dev, phpmyadmin]
 
-- name: Set Blowfish Secret
-  replace:
-    path: /etc/webapps/phpmyadmin/config.inc.php
-    regexp: 'ARCHDEV_REPLACE_ME_WITH_RANDOM_STRING_32CH'
-    replace: "{{ blowfish_secret.stdout }}"
+- name: Set Blowfish Secret inside Distrobox
+  shell: |
+    distrobox-enter arch-dev-box -- sudo sed -i "s/ARCHDEV_REPLACE_ME_WITH_RANDOM_STRING_32CH/{{ blowfish_secret.stdout }}/g" /etc/webapps/phpmyadmin/config.inc.php
   tags: [dev, phpmyadmin]
 
-- name: Include phpMyAdmin in Apache Config
-  lineinfile:
-    path: /etc/httpd/conf/httpd.conf
-    line: "Include conf/extra/phpmyadmin.conf"
-    state: present
-  notify: Restart Apache
+- name: Include phpMyAdmin in Apache Config inside Distrobox
+  shell: |
+    distrobox-enter arch-dev-box -- sudo bash -c 'grep -q "Include conf/extra/phpmyadmin.conf" /etc/httpd/conf/httpd.conf || echo "Include conf/extra/phpmyadmin.conf" >> /etc/httpd/conf/httpd.conf'
   tags: [dev, apache, phpmyadmin]
 
-- name: Enable MPM Prefork (Required for mod_php)
-  replace:
-    path: /etc/httpd/conf/httpd.conf
-    regexp: '^LoadModule mpm_event_module'
-    replace: '#LoadModule mpm_event_module'
+- name: Enable MPM Prefork inside Distrobox
+  shell: |
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^LoadModule mpm_event_module/#LoadModule mpm_event_module/g' /etc/httpd/conf/httpd.conf
+    distrobox-enter arch-dev-box -- sudo sed -i 's/^#LoadModule mpm_prefork_module/LoadModule mpm_prefork_module/g' /etc/httpd/conf/httpd.conf
   tags: [dev, apache]
 
-- name: Ensure MPM Prefork is loaded
-  replace:
-    path: /etc/httpd/conf/httpd.conf
-    regexp: '^#LoadModule mpm_prefork_module'
-    replace: 'LoadModule mpm_prefork_module'
-  notify: Restart Apache
-  tags: [dev, apache]
-
-- name: Start and enable Apache service
-  systemd:
-    name: httpd
-    enabled: yes
-    state: started
+- name: Enable Apache service inside Distrobox
+  shell: distrobox-enter arch-dev-box -- sudo systemctl enable --now httpd
+  ignore_errors: yes
   tags: [dev, apache]

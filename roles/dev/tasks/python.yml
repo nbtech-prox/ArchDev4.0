@@ -1,15 +1,11 @@
 ---
 # --- ASDF Setup for Python/Poetry Version Management ---
-# Permite usar 'bubble p' para criar ambientes Python isolados com Poetry
-- name: Install ASDF Python and Poetry plugins
+- name: Install ASDF Python and Poetry plugins inside Distrobox
   shell: |
-    . /opt/asdf-vm/asdf.sh
-    asdf plugin add python https://github.com/asdf-community/asdf-python.git || true
-    asdf plugin add poetry https://github.com/asdf-community/asdf-poetry.git || true
-  args:
-    executable: /bin/bash
+    distrobox-enter arch-dev-box -- bash -c '. /opt/asdf-vm/asdf.sh && asdf plugin add python https://github.com/asdf-community/asdf-python.git || true'
+    distrobox-enter arch-dev-box -- bash -c '. /opt/asdf-vm/asdf.sh && asdf plugin add poetry https://github.com/asdf-community/asdf-poetry.git || true'
   ignore_errors: yes
   tags: [dev, python, asdf]
 
 # --- Python Tools ---
-# Poetry também é instalado via pacman (fallback), mas ASDF permite versionamento por projeto
+# Poetry também é instalado via pacman na Arch-Dev-Box, mas ASDF permite versionamento por projeto

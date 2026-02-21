@@ -33,49 +33,30 @@
 # NOTA: Firefox profile e user.js configurados em assets.yml
 
 # --- Spicetify (Seguro) ---
-- name: Check if Spicetify is installed
-  command: which spicetify
+- name: Check if Spicetify is installed in Distrobox
+  shell: distrobox-enter arch-dev-box -- command -v spicetify
   register: spicetify_check
   ignore_errors: true
   changed_when: false
+  become: no
   tags: [desktop, spicetify]
 
-- name: Check if Spotify is installed
-  command: which spotify
+- name: Check if Spotify is installed in Distrobox
+  shell: distrobox-enter arch-dev-box -- command -v spotify
   register: spotify_check
   ignore_errors: true
   changed_when: false
+  become: no
   tags: [desktop, spicetify]
 
-# SOLUÇÃO SEGURA: Mudar grupo para o usuário e dar permissão ao grupo
-- name: Set Spotify Permissions for Spicetify (Secure)
-  file:
-    path: /opt/spotify
-    owner: root
-    group: "{{ target_user }}"  # Muda o grupo para o teu usuário
-    mode: '0775'                # rwxrwxr-x (dono e grupo podem escrever)
-    recurse: yes
-  when: 
-    - spicetify_check.rc == 0
-    - spotify_check.rc == 0
-    - ansible_facts['os_family'] == 'Archlinux'
-  ignore_errors: true
-  tags: [desktop, spicetify]
-
-# Alternativa ainda melhor: Usar ACL (Access Control List)
-# Isto dá permissão específica ao teu usuário sem mudar o grupo
-- name: Set Spotify Permissions using ACL (Mais Seguro)
-  ansible.posix.acl:
-    path: /opt/spotify
-    entity: "{{ target_user }}"
-    etype: user
-    permissions: rwx
-    recursive: yes
-    state: present
+- name: Set Spotify Permissions using ACL inside Distrobox
+  shell: |
+    distrobox-enter arch-dev-box -- sudo setfacl -R -m u:{{ target_user }}:rwx /opt/spotify
   when: 
     - spicetify_check.rc == 0
     - spotify_check.rc == 0
   ignore_errors: true
+  become: no
   tags: [desktop, spicetify]
 
 - name: Check if Spotify preferences file exists
@@ -87,12 +68,14 @@
     - spotify_check.rc == 0
   tags: [desktop, spicetify]
 
-- name: Apply Spicetify Theme (Catppuccin Mocha)
+- name: Apply Spicetify Theme (Catppuccin Mocha) inside Distrobox
   shell: |
+    distrobox-enter arch-dev-box -- bash -c '
     spicetify config current_theme catppuccin
     spicetify config color_scheme mocha
     spicetify config inject_css 1 replace_colors 1 overwrite_assets 1
     spicetify backup apply
+    '
   become: no
   when: 
     - spicetify_check.rc == 0

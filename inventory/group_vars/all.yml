@@ -74,7 +74,7 @@ packages_dev_tools:
   - direnv
   - antigravity
 
-packages_dev_web:
+packages_distrobox:
   - php
   - php-fpm
   - php-gd
@@ -90,11 +90,10 @@ packages_dev_web:
   - apache
   - php-apache
   - phpmyadmin
-
-packages_dev_python:
   - python
   - python-poetry
   - tk
+  - asdf-vm
 
 packages_system:
   - go

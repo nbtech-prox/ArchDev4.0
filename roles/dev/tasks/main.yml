@@ -3,26 +3,17 @@
 # Install Development Packages
 # --------------------------------------------------------
 
-- name: Install Developer Tools
+- name: Install Developer Tools (Host)
   pacman:
     name: "{{ packages_dev_tools + packages_terminal }}"
     state: present
   become: yes
   tags: [dev, tools]
 
-- name: Install Web Dev Stack (PHP/Laravel)
-  pacman:
-    name: "{{ packages_dev_web }}"
-    state: present
-  become: yes
-  tags: [dev, web]
-
-- name: Install Python Stack
-  pacman:
-    name: "{{ packages_dev_python }}"
-    state: present
-  become: yes
-  tags: [dev, python]
+- name: Install Development Stack inside Distrobox (PHP/Web/Python)
+  command: distrobox-enter arch-dev-box -- sudo pacman -S --noconfirm {{ packages_distrobox | join(' ') }}
+  become: no
+  tags: [dev, web, python, distrobox]
 
 # --------------------------------------------------------
 # Docker Setup
