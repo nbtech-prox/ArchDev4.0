@@ -1,4 +1,4 @@
-# ❄️ ArchDev v3.0 - The Elite Developer Infrastructure (Ansible Edition)
+# ❄️ ArchDev v4.0 - The Immutable & Cloud-Native Desktop (Ansible Edition)
 
 ![Preview](roles/desktop/files/preview_nord.png)
 
@@ -11,22 +11,22 @@
 ![Theme](https://img.shields.io/badge/Theme-Catppuccin%20Mocha-F5C2E7)
 
 **O ambiente definitivo para produtividade extrema em Arch Linux.**
-*Agora reescrito do zero com Ansible para automação profissional, idempotência e modularidade pura.*
+*Agora reescrito para o paradigma Cloud-Native com Host Imutável, Distrobox Containerization e GitOps Local.*
 
-[Instalação](#-instalação) • [Pós-Instalação](#-pós-instalação) • [Ambientes Herméticos](#-ambientes-herméticos-bubble-v30) • [Atalhos do Sistema](#-domínio-do-sistema-guia-de-atalhos-master)
+[Instalação](#-instalação) • [Pós-Instalação](#-pós-instalação) • [Ambientes Containerizados](#-ambientes-herméticos-bubble-v40) • [Automação GitOps](#-automação-gitops-pull--push)
 
 </div>
 
 ---
 
-## 💎 A Filosofia ArchDev v3.0
+## 💎 A Filosofia ArchDev v4.0
 
-O **ArchDev v3.0** não é apenas uma atualização visual. É uma evolução na arquitetura. Abandonámos os scripts bash frágeis e abraçámos a **Infraestrutura como Código (IaC)** com **Ansible**.
+O **ArchDev v4.0** representa uma mudança de paradigma. Passamos de um sistema tradicional altamente acoplado para uma **Arquitetura Imutável e Containerizada**.
 
-*   **Idempotente**: O `setup.sh` pode ser corrido infinitas vezes. Ele apenas aplica o que mudou, sem duplicar configs ou partir o sistema.
-*   **Modular**: Queres apenas a stack PHP? O ambiente gráfico? É tudo gerido por `roles` independentes.
-*   **Seguro**: Rollbacks automáticos no boot (Btrfs + Snapper + Limine) e backups automáticos das tuas configs locais antes de qualquer alteração.
-*   **Estético**: Transição completa para **Catppuccin Mocha** (GTK, Qt, Hyprland, SDDM, Terminal), substituindo o antigo Nord.
+A filosofia assenta em 3 pilares fundamentais:
+*   **The Immutable Core**: O Sistema Operativo do teu PC (Host) foi reduzido ao mínimo indispensável. Corre apenas o Kernel, Drivers Gráficos, Hyprland, Terminal e Ferramentas Pessoais base (SSH/Pass/Keys). É estático, ultra-seguro e imune à quebra de pacotes de desenvolvimento.
+*   **The Dev Box (Distrobox)**: **Todo o teu ambiente de desenvolvimento (Laravel/PHP, Python, IDEs Pesadas, Node.js, Spotify, Docker, AUR Tools)** corre encapsulado dentro de um Contentor Arch Linux não-privilegiado (na imagem `arch-dev-box`). Sentirás que elas correm localmente, mas elas não podem destruir o teu sistema.
+*   **GitOps (CI / CD Locais)**: Automação completa na nuvem e no PC local. Validações contínuas de GitHub/GitLab Actions na *branch main*, e um serviço `archdev-pull` a correr invisivelmente em *background* a fazer atualizações automáticas sempre que editas um ficheiro config no telemóvel.
 
 ---
 
@@ -72,8 +72,8 @@ Recomendamos instalar o Arch Linux usando o **`archinstall`** com estas opções
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/teu-usuario/ArchDev3.0.git
-cd ArchDev3.0
+git clone https://github.com/teu-usuario/ArchDev4.0.git
+cd ArchDev4.0
 
 # 2. Execute o Setup Mágico
 chmod +x setup.sh
@@ -84,12 +84,13 @@ chmod +x setup.sh
 
 **O que o script faz sozinho:**
 1.  Verifica e instala o Ansible.
-2.  Instala todos os pacotes (Pacman + AUR).
+2.  Instala todos os pacotes (Pacman + AUR do Host).
 3.  Configura o sistema (Btrfs, Snapper).
-4.  Configura a UI (Hyprland, Waybar, Catppuccin).
-5.  Sincroniza os Dotfiles e Scripts.
+4.  Cria o contentor **Distrobox** de Desenvolvimento.
+5.  Configura a UI (Hyprland, Waybar, Catppuccin).
+6.  Sincroniza os Dotfiles e Scripts.
 
-> 💡 **Nota:** Após a instalação podes apagar a pasta `ArchDev3.0/`. O sistema fica independente.
+> 💡 **Nota:** Após a instalação podes apagar a pasta `ArchDev4.0/`. O sistema fica independente.
 
 ---
 
@@ -102,13 +103,13 @@ chmod +x setup.sh
 > O reboot é necessário para o Docker ativar e o Hyprland iniciar corretamente.
 
 ### 1. MariaDB (Segurança)
-Após o reboot, configura o MariaDB automaticamente:
+Após o reboot, configura o MariaDB automaticamente (dentro do Distrobox):
 ```bash
-sudo archdev-mariadb-setup
+distrobox-enter arch-dev-box -- sudo archdev-mariadb-setup
 ```
 Este script configura tudo automaticamente e gera uma password segura para root.
 
-> 💡 Alternativa manual: `sudo mariadb-secure-installation`
+> 💡 Alternativa manual: `distrobox-enter arch-dev-box -- sudo mariadb-secure-installation`
 
 ### 2. Docker
 O teu utilizador já está no grupo `docker`. Após o **reboot**, testa:
@@ -117,10 +118,10 @@ docker run hello-world
 ```
 
 ### 3. Spotify
-O Spotify e o tema Catppuccin já estão instalados. Basta abrir o Spotify uma vez para ativar.
+O Spotify e o tema Catppuccin já estão instalados no interior da Dev Box. Basta abrir pelo Rofi para ativar, pois os ícones foram exportados.
 
 ### 4. Password Manager (pass)
-O `pass` é um gestor de passwords que usa criptografia GPG. Precisas de criar uma chave GPG primeiro:
+O `pass` é um gestor de passwords que usa criptografia GPG. O setup corre no Host:
 
 ```bash
 # Configura automaticamente (cria chave GPG + inicializa pass)
@@ -145,23 +146,23 @@ archdev-backup-keys
 Guarda o backup num local seguro (USB, cloud cifrada).
 
 ### 6. Apagar a Pasta de Instalação (Opcional)
-Após a instalação completa, a pasta `ArchDev3.0/` pode ser removida:
+Após a instalação completa, a pasta `ArchDev4.0/` pode ser removida se quiseres:
 ```bash
 cd ..
-rm -rf ArchDev3.0/
+rm -rf ArchDev4.0/
 ```
-O sistema fica totalmente independente.
+No entanto, recomendamos mantê-la para o GitOps funcionar perfeitamente.
 
 ### 7. Limpeza do Sistema
 Mantenha o sistema leve libertando espaço em disco:
 *   `paccache -r`: Mantém apenas as 3 últimas versões de pacotes pacman/AUR.
-*   `docker system prune -a`: Remove containers, volumes e imagens Docker não em uso.
+*   `podman system prune -a`: Remove containers, volumes e imagens Podman/Docker não em uso.
 
 ---
 
-## 🧬 Ambientes Herméticos (Bubble v3.0)
+## 🧬 Ambientes Containerizados (Bubble v4.0)
 
-O setup v3.0 mantém o conceito de **bolhas de ambiente** da v2.5. Cada projeto é isolado.
+O setup v4.0 mantém o conceito de **bolhas de ambiente**. Cada projeto é isolado, agora rodando **inteiramente debaixo do Distrobox**.
 
 ### O Comando `bubble`
 Dentro da pasta do seu projeto, execute:
@@ -172,27 +173,35 @@ bubble [opção]
 
 | Comando | Descrição | O que faz por trás dos panos? |
 | :--- | :--- | :--- |
-| `bubble l` | Cria bolha **Laravel / PHP** | Cria `.tool-versions` (php) e ativa `direnv` com suporte asdf. |
-| `bubble p` | Cria bolha **Python** | Cria `.tool-versions` (python/poetry) e configura virtualenv local. |
+| `bubble l` | Cria bolha **Laravel / PHP** | Cria `.tool-versions` (php) e ativa `direnv` com suporte asdf. *Abre o projeto no contentor.* |
+| `bubble p` | Cria bolha **Python** | Cria `.tool-versions` (python/poetry) e configura virtualenv local. *Abre o projeto no contentor.* |
 
 **Exemplo Laravel:**
 ```bash
 mkdir meu-projeto && cd meu-projeto
 git init
 bubble l
-# O terminal agora usa a versão PHP definida no projeto, isolada do sistema.
+# O terminal agora usa a versão PHP definida no projeto, processada pelo arch-dev-box.
 ```
 
 ---
 
-## 🔄 Automação Git (Sync Offline)
+## 🔄 Automação GitOps (Pull & Push)
 
-O teu ambiente inclui o serviço `git-autosync` que é instalado e corre em background por padrão:
-*   Monitoriza a tua pasta de projetos (configurada no `inventory/group_vars/all.yml` via `projects_dir`).
+O teu ambiente é 100% gerido por Infraestrutura como Código. Incluímos um CI/CD local e remoto invisível:
+
+### O Push: `git-autosync`
+*   Monitoriza a tua pasta de projetos.
 *   A cada 5 minutos, verifica de forma silenciosa se há conexão à internet.
-*   Se houver, faz `git push` automático de todos os teus repositórios com alterações não sincronizadas. Perfeito para trabalhar em movimento e sincronizar o código assim que apanhas Wi-Fi.
+*   Se houver, faz `git push` automático de todos os teus repositórios com alterações não sincronizadas. Perfeito para trabalhar em movimento.
 
-> 💡 **Dica:** Para desativar/parar temporariamente o sync automático, usa: `sudo systemctl stop git-autosync`
+### O Pull: `archdev-pull` (GitOps)
+*   A cada 6 horas um serviço secundário (`archdev-pull.timer`) acorda.
+*   Ele liga-se ao GitHub/GitLab, e se tu tiveres editado uma *config* no teu telemóvel, ele puxa o novo código (`git pull`).
+*   Se detetar mudanças, envia-te uma notificação nativa indicando o sucesso da operação.
+
+> 💡 **Dica:** Para gerir estes daemons podes usar:
+> `sudo systemctl status git-autosync` ou `sudo systemctl status archdev-pull.timer`.
 
 ---
 
