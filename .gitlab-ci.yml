@@ -9,4 +9,5 @@ ansible-syntax-check:
     - pacman -Sy --noconfirm ansible python-pip
     - pip install ansible-lint --break-system-packages
   script:
-    - ansible-playbook --syntax-check playbooks/site.yml
+    - chmod o-w .
+    - ANSIBLE_ROLES_PATH=./roles ansible-playbook --syntax-check playbooks/site.yml

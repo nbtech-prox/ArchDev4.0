@@ -26,5 +26,7 @@ jobs:
           pip install ansible ansible-lint
 
       - name: Run Ansible Syntax Check
+        env:
+          ANSIBLE_ROLES_PATH: ./roles
         run: |
           ansible-playbook --syntax-check playbooks/site.yml
