@@ -60,9 +60,6 @@ packages_terminal:
   - fastfetch
   - tree-sitter-cli
   - jq          # JSON parser (requerido pelos scripts Waybar)
-  - pass        # Password store
-  - gnupg       # GPG para pass
-  - xclip       # Clipboard para pass
 
 packages_dev_tools:
   - neovim

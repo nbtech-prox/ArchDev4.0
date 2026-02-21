@@ -51,9 +51,6 @@
 - include_tasks: git_autosync.yml
   tags: [dev, git-autosync]
 
-- include_tasks: pass_helper.yml
-  tags: [dev, pass]
-
 # --------------------------------------------------------
 # Helpers Directory Structure
 # --------------------------------------------------------

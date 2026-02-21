@@ -23,7 +23,6 @@ sudo archdev-mariadb-setup
 
 ### Helpers disponíveis em ~/.config/helpers/
 - `archdev-bitwarden-setup` - Configurar Bitwarden
-- `archdev-backup-keys` - Backup SSH + GPG
 - `archdev-mariadb-setup` - Configurar MariaDB
 - `git-autosync` - Sincronização automática de repos
 
@@ -64,11 +63,6 @@ sys             # btop (monitor sistema)
 ### Docker
 ```bash
 docker run hello-world    # Testar docker
-```
-
-### Backup
-```bash
-archdev-backup-keys       # Backup SSH + GPG
 ```
 
 ## 6. Personalização
