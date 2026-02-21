@@ -43,3 +43,51 @@
     enabled: yes
     state: started
   tags: [dev, git-autosync, helpers]
+
+# --- GitOps Automator (Pull) ---
+- name: Install GitOps Pull Script
+  copy:
+    src: archdev-pull.sh
+    dest: "{{ target_home }}/.config/helpers/archdev-pull.sh"
+    mode: '0755'
+    owner: "{{ target_user }}"
+    group: "{{ target_user }}"
+  tags: [dev, gitops, helpers]
+
+- name: Create symlink for archdev-pull
+  file:
+    src: "{{ target_home }}/.config/helpers/archdev-pull.sh"
+    dest: /usr/local/bin/archdev-pull
+    state: link
+    force: yes
+  become: yes
+  tags: [dev, gitops, helpers]
+
+- name: Create GitOps Service
+  template:
+    src: archdev-pull.service.j2
+    dest: /etc/systemd/system/archdev-pull.service
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  tags: [dev, gitops, helpers]
+
+- name: Create GitOps Timer
+  template:
+    src: archdev-pull.timer.j2
+    dest: /etc/systemd/system/archdev-pull.timer
+    owner: root
+    group: root
+    mode: '0644'
+  become: yes
+  tags: [dev, gitops, helpers]
+
+- name: Enable and Start GitOps Timer
+  systemd:
+    daemon_reload: yes
+    name: archdev-pull.timer
+    enabled: yes
+    state: started
+  become: yes
+  tags: [dev, gitops, helpers]

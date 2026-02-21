@@ -1,0 +1,12 @@
+[Unit]
+Description=ArchDev GitOps Automator Daemon
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/archdev-pull "{{ projects_dir | default('/mnt/projetos') }}/ArchDev4.0"
+User={{ target_user }}
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=DISPLAY=:0
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/{{ ansible_user_uid | default(1000) }}/bus

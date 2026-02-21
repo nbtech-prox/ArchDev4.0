@@ -1,0 +1,12 @@
+image: archlinux:latest
+
+stages:
+  - test
+
+ansible-syntax-check:
+  stage: test
+  before_script:
+    - pacman -Sy --noconfirm ansible python-pip
+    - pip install ansible-lint --break-system-packages
+  script:
+    - ansible-playbook --syntax-check playbooks/site.yml

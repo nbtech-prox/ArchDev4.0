@@ -1,0 +1,10 @@
+[Unit]
+Description=Timer for ArchDev GitOps Automator
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=6h
+Unit=archdev-pull.service
+
+[Install]
+WantedBy=timers.target
