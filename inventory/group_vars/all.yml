@@ -151,7 +151,7 @@ packages_admin:
   - lynis     
 
 # --- Diretórios ---
-projects_dir: "/mnt/projetos"
+projects_dir: "{{ target_home }}/Projetos"
 
 # --- Configuração do Sistema ---
 keyboard_layout: "pt"

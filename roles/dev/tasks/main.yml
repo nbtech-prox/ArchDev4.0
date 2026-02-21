@@ -11,7 +11,7 @@
   tags: [dev, tools]
 
 - name: Install Development Stack inside Distrobox (PHP/Web/Python)
-  command: distrobox-enter arch-dev-box -- sudo pacman -S --noconfirm {{ packages_distrobox | join(' ') }}
+  command: distrobox-enter arch-box -- sudo pacman -S --noconfirm {{ packages_distrobox | join(' ') }}
   become: no
   tags: [dev, web, python, distrobox]
 

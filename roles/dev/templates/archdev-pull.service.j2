@@ -5,7 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/archdev-pull "{{ projects_dir | default('/mnt/projetos') }}/ArchDev4.0"
+ExecStart=/usr/local/bin/archdev-pull "{{ playbook_dir | dirname }}"
 User={{ target_user }}
 Environment=PATH=/usr/bin:/usr/local/bin
 Environment=DISPLAY=:0

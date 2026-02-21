@@ -9,7 +9,7 @@ set -uo pipefail
 
 LOCK_FILE="/tmp/archdev-pull.lock"
 LOG_FILE="$HOME/.local/log/archdev-pull.log"
-ARCHDEV_REPO="${1:-/mnt/projetos/ArchDev4.0}"
+ARCHDEV_REPO="${1:-$HOME/ArchDev}"
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"

@@ -25,7 +25,7 @@ O **ArchDev v4.0** representa uma mudança de paradigma. Passamos de um sistema 
 
 A filosofia assenta em 3 pilares fundamentais:
 *   **The Immutable Core**: O Sistema Operativo do teu PC (Host) foi reduzido ao mínimo indispensável. Corre apenas o Kernel, Drivers Gráficos, Hyprland, Terminal e Ferramentas Pessoais base (SSH/Pass/Keys). É estático, ultra-seguro e imune à quebra de pacotes de desenvolvimento.
-*   **The Dev Box (Distrobox)**: **Todo o teu ambiente de desenvolvimento (Laravel/PHP, Python, IDEs Pesadas, Node.js, Spotify, Docker, AUR Tools)** corre encapsulado dentro de um Contentor Arch Linux não-privilegiado (na imagem `arch-dev-box`). Sentirás que elas correm localmente, mas elas não podem destruir o teu sistema.
+*   **The Dev Box (Distrobox)**: **Todo o teu ambiente de desenvolvimento (Laravel/PHP, Python, IDEs Pesadas, Node.js, Spotify, Docker, AUR Tools)** corre encapsulado dentro de um Contentor Arch Linux não-privilegiado (na imagem `arch-box`). Sentirás que elas correm localmente, mas elas não podem destruir o teu sistema.
 *   **GitOps (CI / CD Locais)**: Automação completa na nuvem e no PC local. Validações contínuas de GitHub/GitLab Actions na *branch main*, e um serviço `archdev-pull` a correr invisivelmente em *background* a fazer atualizações automáticas sempre que editas um ficheiro config no telemóvel.
 
 ---
@@ -72,8 +72,8 @@ Recomendamos instalar o Arch Linux usando o **`archinstall`** com estas opções
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/teu-usuario/ArchDev4.0.git
-cd ArchDev4.0
+git clone https://github.com/SEU_USUARIO/ArchDev.git
+cd ArchDev
 
 # 2. Execute o Setup Mágico
 chmod +x setup.sh
@@ -90,7 +90,7 @@ chmod +x setup.sh
 5.  Configura a UI (Hyprland, Waybar, Catppuccin).
 6.  Sincroniza os Dotfiles e Scripts.
 
-> 💡 **Nota:** Após a instalação podes apagar a pasta `ArchDev4.0/`. O sistema fica independente.
+> 💡 **Nota:** Após a instalação podes apagar a pasta `ArchDev/`. O sistema fica independente.
 
 ---
 
@@ -105,11 +105,11 @@ chmod +x setup.sh
 ### 1. MariaDB (Segurança)
 Após o reboot, configura o MariaDB automaticamente (dentro do Distrobox):
 ```bash
-distrobox-enter arch-dev-box -- sudo archdev-mariadb-setup
+distrobox-enter arch-box -- sudo archdev-mariadb-setup
 ```
 Este script configura tudo automaticamente e gera uma password segura para root.
 
-> 💡 Alternativa manual: `distrobox-enter arch-dev-box -- sudo mariadb-secure-installation`
+> 💡 Alternativa manual: `distrobox-enter arch-box -- sudo mariadb-secure-installation`
 
 ### 2. Docker
 O teu utilizador já está no grupo `docker`. Após o **reboot**, testa:
@@ -181,7 +181,7 @@ bubble [opção]
 mkdir meu-projeto && cd meu-projeto
 git init
 bubble l
-# O terminal agora usa a versão PHP definida no projeto, processada pelo arch-dev-box.
+# O terminal agora usa a versão PHP definida no projeto, processada pelo arch-box.
 ```
 
 ---

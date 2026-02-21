@@ -2,8 +2,8 @@
 # --- ASDF Setup for Python/Poetry Version Management ---
 - name: Install ASDF Python and Poetry plugins inside Distrobox
   shell: |
-    distrobox-enter arch-dev-box -- bash -c '. /opt/asdf-vm/asdf.sh && asdf plugin add python https://github.com/asdf-community/asdf-python.git || true'
-    distrobox-enter arch-dev-box -- bash -c '. /opt/asdf-vm/asdf.sh && asdf plugin add poetry https://github.com/asdf-community/asdf-poetry.git || true'
+    distrobox-enter arch-box -- bash -c '. /opt/asdf-vm/asdf.sh && asdf plugin add python https://github.com/asdf-community/asdf-python.git || true'
+    distrobox-enter arch-box -- bash -c '. /opt/asdf-vm/asdf.sh && asdf plugin add poetry https://github.com/asdf-community/asdf-poetry.git || true'
   ignore_errors: yes
   tags: [dev, python, asdf]
 
